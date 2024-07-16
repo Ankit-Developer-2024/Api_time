@@ -30,13 +30,13 @@ class ApiRequest {
     Function(dynamic error,dynamic val)? onError,
   }) async {
     try {
-       print("url:----${url} ---- ${this.queryParams as Map<String, dynamic>}----${this.headers}  ${apiTimeOut.runtimeType}");
+      // print("url:----${url} ---- ${this.queryParams as Map<String, dynamic>}----${this.headers}");
       dynamic response = await _dio().get(url!, queryParameters: queryParams as Map<String, dynamic>, );
 
       if (response!=null) {
         onSuccess?.call(response);
       } else {
-        onError?.call('api error in get Request ','');
+        onError?.call('api error in get   Request ','');
       }
        return response;
     } on DioException catch (e) {

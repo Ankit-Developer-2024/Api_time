@@ -1,12 +1,13 @@
 
 
 import 'package:api_time/HomePageController.dart';
-import 'package:api_time/RespmsePage.dart';
+import 'package:api_time/ResponsePage.dart';
 import 'package:api_time/cURL.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HomePage extends StatelessWidget {
+   HomePage({super.key});
 
   HomePageController controller=Get.put(HomePageController());
 
@@ -92,12 +93,46 @@ class HomePage extends StatelessWidget {
                        ),
                      ),
                      const SizedBox(width: 5,),
+                     Column(
+                       children: [
+                         ConstrainedBox(
+                              constraints: BoxConstraints(minHeight: 20, maxHeight: 20,minWidth:50,maxWidth:100),
+                             child: OutlinedButton(
+                                 onPressed: (){
+                                   controller.apiMethod.value='Dio';
+                                 },
+                                 style: OutlinedButton.styleFrom(// Text color// Background color
+                                   backgroundColor: controller.apiMethod=='Dio' ? Colors.green : Colors.blue,
+                                   side: const BorderSide(color: Colors.white, width: 0.5), // Border color and width
+                                    padding: const EdgeInsets.symmetric(horizontal: 5,), // Padding inside the button
+                                   shape: RoundedRectangleBorder(
+                                     borderRadius: BorderRadius.circular(2), // Rounded corners
+                                   ),
+                                 ),
+                                 child: Text('Dio',style: TextStyle(color: Colors.white,fontSize: 13)))),
+                         ConstrainedBox(
+                             constraints: BoxConstraints(minHeight: 20,maxHeight: 20,minWidth:50,maxWidth:100),
+                             child: OutlinedButton(
+                                 onPressed: (){
+                                   controller.apiMethod.value='Http';
+                                 },
+                                 style: OutlinedButton.styleFrom(// Text color// Background color
+                                   backgroundColor: controller.apiMethod =='Http' ? Colors.green : Colors.blue,
+                                   side: const BorderSide(color: Colors.white, width: 0.5), // Border color and width
+                                    padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0), // Padding inside the button
+                                   shape: RoundedRectangleBorder(
+                                     borderRadius: BorderRadius.circular(2), // Rounded corners
+                                   ),
+                                 ),
+                                 child: Text('Http ',style: TextStyle(color: Colors.white,fontSize: 13)))),
+                       ],
+                     ),
+                     const SizedBox(width: 5,),
                      ConstrainedBox(
                        constraints: const BoxConstraints(minWidth:50,maxWidth:100 ,minHeight: 40),
                        child: OutlinedButton(
                            onPressed: (){
 
-                             // funn();
 
                              if(controller.cURLController.text.isNotEmpty ){
                                // Get.snackbar(
@@ -240,37 +275,6 @@ class HomePage extends StatelessWidget {
 
                            onPressed: () async {
 
-                              //                              String curlCommand = '''
-//                              curl -L 'https://devservices.justapi.in/just/b2b/product/api/v2/app/get/trays?user_id=6739&screen_name=home' \
-// --header 'Authorization: Bearer eyJhb GciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjA0NDQ2MjMsImlhdCI6MTcyMDQzNzQyMywiaXNzIjoianVzdCIsIm1vYmlsZSI6IiIsInVzZXJfaWQiOiI2NzM5In0.433x-uNEX1yEa1GiBbeG7DcyrFOsDrn6IN_6wAkWJI0' \
-// --header 'Content-Type: application/json' \
-// --data ' {
-//                       "id": 353,
-//                       "name": "Fruits",
-//                       "type": "category",
-//                       "type_id": 1,
-//                       "action": "",
-//                       "keyword": null,
-//                       "image": "",
-//                       "event": "",
-//                       "active": 1,
-//                       "deleted": false,
-//                       "created_at": "2023-04-26T13:19:08.000Z",
-//                       "updated_at": "2023-04-26T13:19:08.000Z",
-//                       "user_order_count_condition": null,
-//                       "description": null,
-//                       "category_detail": {
-//                           "id": "1",
-//                           "name": "Fruits",
-//                           "image": "https://dev.justapi.in/uploads/media/2022/Exotics-280.jpg",
-//                           "description": null
-//                       },
-//                       "assets_position": 0
-//                   }'
-//   ''';
-//
-//                              callApiFromCurl(curlCommand);
-
 
 
                              controller.apiDetails?.clear();
@@ -306,7 +310,7 @@ class HomePage extends StatelessWidget {
                                borderRadius: BorderRadius.circular(2), // Rounded corners
                              ),
                            ),
-                           child: const Text("Sumbit",style: TextStyle(color: Colors.white,fontSize: 13),)),
+                           child: const Text("Submit",style: TextStyle(color: Colors.white,fontSize: 13),)),
                          )
                      )
                    ],
@@ -409,7 +413,6 @@ Widget rightSideApiDetails(HomePageController controller,BuildContext context){
                   itemCount: controller.apiDetails?.length,
                   itemBuilder: (context,index){
                     dynamic mp=controller.apiDetails![index];
-                    print("apiDetails: $mp");
                     return Container(
                       margin: const EdgeInsets.all(5),
                       padding: const EdgeInsets.all(3),
@@ -427,7 +430,7 @@ Widget rightSideApiDetails(HomePageController controller,BuildContext context){
                             mainAxisAlignment:  MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Index: ${mp['urlNumber']} | ',style: const TextStyle(color: Colors.white,fontSize: 13),),
+                              Text('Index: ${mp['urlNumber']} | Api Index: ${mp['apiIndex']} |',style: const TextStyle(color: Colors.white,fontSize: 13),),
                               Text('RequestType: ${mp['requestType']} | ',style: const TextStyle(color: Colors.white,fontSize: 13),),
                               Row(
                                 children: [
@@ -464,7 +467,7 @@ Widget rightSideApiDetails(HomePageController controller,BuildContext context){
                               const SizedBox(width: 5,),
                               GestureDetector(
                                   onTap: (){
-                                   // print("===mppp${mp['resBody']}");
+
                                     mp['resBody']=='Loader' ?
                                     Get.snackbar('Try to Fetch data', '',
                                         maxWidth:Get.width/4,
@@ -472,7 +475,7 @@ Widget rightSideApiDetails(HomePageController controller,BuildContext context){
                                         colorText: Colors.white,
                                         snackPosition:SnackPosition.BOTTOM,
                                         duration:const Duration(milliseconds: 800)
-                                    )  : Get.to(duration: Duration(seconds: 2), ResponsePage(response:mp['resBody']));
+                                    )  : Get.to(duration: const Duration(seconds: 1), ResponsePage(response:mp['resBody']));
                                   },
                                   child:  mp['resBody']=='Loader' ?
                                                       Container(

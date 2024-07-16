@@ -1,7 +1,8 @@
 
 import 'dart:convert';
 
-import 'package:api_time/ApiRequest.dart';
+import 'package:api_time/ApiRequestDio.dart';
+import 'package:api_time/ApiRequestHttp.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,6 +22,7 @@ class HomePageController extends GetxController {
   RxList cURL = [].obs;
   RxString token = ''.obs;
   RxInt apiTimeOut = 30000.obs;
+  RxString apiMethod="Dio".obs;
 
   RxInt apiCallCount = 1.obs;
   RxInt apiInterval = 0.obs;
@@ -70,7 +72,8 @@ class HomePageController extends GetxController {
     int index=0;
     for (int j = 0; j < apiCallCount.value; j++) {
       for (int i = 0; i < urls!.length; i++) {
-        apiCall(i,index);
+
+        apiMethod.value=='Dio' ? apiCall(i,index,j): apiCallhttp(i,index,j);
         index++;
       }
       await Future.delayed(Duration(milliseconds: apiInterval.value));
@@ -78,15 +81,16 @@ class HomePageController extends GetxController {
   }
 
 
-  void apiCall(int i,int index) async {
+  void apiCall(int i,int index,int j) async {
     dynamic apiData=urls?[i];
-    print("aptData: $apiData");
+  //  print("aptData: $apiData");
     switch(apiData["requestType"]){
       case "GET":
         try{
           apiDetails?.add(
               {
                 "urlNumber": (i + 1).toString(),
+                "apiIndex": (j + 1).toString(),
                 "url": apiData['url'],
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
@@ -97,13 +101,14 @@ class HomePageController extends GetxController {
               }
           );
           apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
-          await ApiRequest(url: apiData["url"],queryParams: apiData["queryParameter"],apiTimeOut: apiData["timeOut"],headers: apiData["headers"]).get(
+           ApiRequest(url: apiData["url"],queryParams: apiData["queryParameter"],apiTimeOut: apiData["timeOut"],headers: apiData["headers"]).get(
             onSuccess: (res) {
               String responseString = res.toString();
               apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
               totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
                apiDetails?[index]={
                  "urlNumber": (i + 1).toString(),
+                 "apiIndex": (j + 1).toString(),
                  "url": apiData['url'],
                  "requestType":apiData['requestType'],
                  "startTime": apiStartTime.value,
@@ -132,7 +137,7 @@ class HomePageController extends GetxController {
             },
           );
         }catch (e) {
-          print(']]]]$e');
+          print('pp$e');
         }
 
         break;
@@ -225,7 +230,7 @@ class HomePageController extends GetxController {
           },
           onError: (err,val) {
             String responseString = val.toString();
-            print("=99${val.statusCode}");
+          //  print("=99${val.statusCode}");
             apiDetails?[index]={
               "urlNumber": (i + 1).toString(),
               "url": apiData['url'],
@@ -279,7 +284,7 @@ class HomePageController extends GetxController {
              },
              onError: (err,val) {
                String responseString = val.toString();
-               print("=99${val.statusCode}");
+              // print("=99${val.statusCode}");
                apiDetails?[index]={
                  "urlNumber": (i + 1).toString(),
                  "url": apiData['url'],
@@ -320,11 +325,11 @@ class HomePageController extends GetxController {
       for (var curlCommand in l) {
         var match = urlRegex.firstMatch(curlCommand);
         if (match != null) {
-          print('Extracted URL : ${match.group(3)}');
+        //  print('Extracted URL : ${match.group(3)}');
           requestType = match.group(1)?.toUpperCase() ?? match.group(2)?.toUpperCase() ?? '';
           url = match.group(3);
         } else {
-          print('No URL found in: $curlCommand');
+       //   print('No URL found in: $curlCommand');
         }
       }
 
@@ -340,13 +345,6 @@ class HomePageController extends GetxController {
       // Extract query parameters
       final queryParams = uri.queryParameters;
 
-      // Print base URL
-      // print('Base URL: $baseUrl');
-      //
-      // // Print query parameters
-      // queryParams.forEach((key, value) {
-      //   print('$key: $value');
-      // });
 
 
 
@@ -415,7 +413,7 @@ class HomePageController extends GetxController {
       urls?.add({'url':baseUrl,'queryParameter':queryParams,'data':jsonData,'requestType':requestType, 'headers':headers,"timeOut":apiTimeOut.value});
       print(urls);
     }catch(e){
-      print(e);
+      //print(e);
       Get.snackbar(e.toString(), '',
         maxWidth:Get.width/4,
           backgroundColor: Colors.black26,
@@ -430,6 +428,235 @@ class HomePageController extends GetxController {
   }
 
 
+
+  void apiCallhttp(int i,int index,int j) async {
+    dynamic apiData=urls?[i];
+    //  print("aptData: $apiData");
+    switch(apiData["requestType"]){
+      case "GET":
+        try{
+          apiDetails?.add(
+              {
+                "urlNumber": (i + 1).toString(),
+                "apiIndex": (j + 1).toString(),
+                "url": apiData['url'],
+                "requestType":apiData['requestType'],
+                "startTime": apiStartTime.value,
+                "endTime": apiEndTime.value,
+                "duration": "Loader",
+                "resBody": "Loader",
+                "statusCode": "Loader"
+              }
+          );
+          apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+          ApiRequestHttp(url: apiData["url"],queryParams: apiData["queryParameter"],apiTimeOut: apiData["timeOut"],headers: apiData["headers"]).get(
+            onSuccess: (res) {
+              String responseString = res.body.toString();
+              apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+              totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+              apiDetails?[index]={
+                "urlNumber": (i + 1).toString(),
+                "apiIndex": (j + 1).toString(),
+                "url": apiData['url'],
+                "requestType":apiData['requestType'],
+                "startTime": apiStartTime.value,
+                "endTime": apiEndTime.value,
+                "duration": totalDuration.value,
+                "resBody": responseString,
+                "statusCode": res.statusCode,
+              };
+              successRequest.value+=1;
+              print('api Success');
+            },
+            onError: (err,val) {
+              String responseString = val.toString();
+              apiDetails?[index]={
+                "urlNumber": (i + 1).toString(),
+                "url": apiData['url'],
+                "requestType":apiData['requestType'],
+                "startTime": apiStartTime.value,
+                "endTime": apiEndTime.value,
+                "duration": totalDuration.value,
+                "resBody": responseString,
+                "statusCode": err=="Response error" ? val.statusCode.toString() : err.toString(),
+              };
+              failedRequest.value+=1;
+              print("-----$err ,$val");
+            },
+          );
+        }catch (e) {
+          print('pp$e');
+        }
+
+        break;
+      case "POST":
+        try {
+          apiDetails?.add(
+              {
+                "urlNumber": (i + 1).toString(),
+                "url": apiData['url'],
+                "requestType":apiData['requestType'],
+                "startTime": apiStartTime.value,
+                "endTime": apiEndTime.value,
+                "duration": "Loader",
+                "resBody": "Loader",
+                "statusCode": "Loader"
+              }
+          );
+          apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+           ApiRequest(url: apiData["url"],data: apiData["data"],apiTimeOut: apiData["timeOut"],headers: apiData["headers"]).post(
+            onSuccess: (res) {
+              String responseString = res.body.toString();
+              apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+              totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+              apiDetails?[index]={
+                "urlNumber": (i + 1).toString(),
+                "url": apiData['url'],
+                "requestType":apiData['requestType'],
+                "startTime": apiStartTime.value,
+                "endTime": apiEndTime.value,
+                "duration": totalDuration.value,
+                "resBody": responseString,
+                "statusCode": res.statusCode,
+              };
+              successRequest.value+=1;
+              print('api Success');
+            },
+            onError: (err,val) {
+              String responseString = val.toString();
+              //print("=99${val.statusCode}");
+              apiDetails?[index]={
+                "urlNumber": (i + 1).toString(),
+                "url": apiData['url'],
+                "requestType":apiData['requestType'],
+                "startTime": apiStartTime.value,
+                "endTime": apiEndTime.value,
+                "duration": totalDuration.value,
+                "resBody": responseString,
+                "statusCode": err=="Response error" ? val.statusCode.toString() : err.toString(),
+              };
+              failedRequest.value+=1;
+              print("-----$err");
+            },
+          );
+        }catch (e) {
+          print('$e');
+        }
+        break;
+      case "PUT":
+        try {
+          apiDetails?.add(
+              {
+                "urlNumber": (i + 1).toString(),
+                "url": apiData['url'],
+                "requestType":apiData['requestType'],
+                "startTime": apiStartTime.value,
+                "endTime": apiEndTime.value,
+                "duration": "Loader",
+                "resBody": "Loader",
+                "statusCode": "Loader"
+              }
+          );
+          apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+           ApiRequest(url: apiData["url"],queryParams: apiData["queryParameter"],data: apiData["data"],apiTimeOut: apiData["timeOut"],headers: apiData["headers"]).put(
+            onSuccess: (res) {
+              String responseString = res.body.toString();
+              apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+              totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+              apiDetails?[index]={
+                "urlNumber": (i + 1).toString(),
+                "url": apiData['url'],
+                "requestType":apiData['requestType'],
+                "startTime": apiStartTime.value,
+                "endTime": apiEndTime.value,
+                "duration": totalDuration.value,
+                "resBody": responseString,
+                "statusCode": res.statusCode,
+              };
+              successRequest.value+=1;
+              print('api Success');
+            },
+            onError: (err,val) {
+              String responseString = val.toString();
+              //  print("=99${val.statusCode}");
+              apiDetails?[index]={
+                "urlNumber": (i + 1).toString(),
+                "url": apiData['url'],
+                "requestType":apiData['requestType'],
+                "startTime": apiStartTime.value,
+                "endTime": apiEndTime.value,
+                "duration": totalDuration.value,
+                "resBody": responseString,
+                "statusCode": err=="Response error" ? val.statusCode.toString() : err.toString(),
+              };
+              failedRequest.value+=1;
+              print("-----$err");
+            },
+          );
+        }catch (e) {
+          print('$e');
+        }
+        break;
+      case "DELETE":
+        try{
+          apiDetails?.add(
+              {
+                "urlNumber": (i + 1).toString(),
+                "url": apiData['url'],
+                "requestType":apiData['requestType'],
+                "startTime": apiStartTime.value,
+                "endTime": apiEndTime.value,
+                "duration": "Loader",
+                "resBody": "Loader",
+                "statusCode": "Loader"
+              }
+          );
+          apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+           ApiRequest(url: apiData["url"],queryParams: apiData["queryParameter"],apiTimeOut: apiData["timeOut"], headers: apiData["headers"]).delete(
+            onSuccess: (res) {
+              String responseString = res.body.toString();
+              apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+              totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+              apiDetails?[index]={
+                "urlNumber": (i + 1).toString(),
+                "url": apiData['url'],
+                "requestType":apiData['requestType'],
+                "startTime": apiStartTime.value,
+                "endTime": apiEndTime.value,
+                "duration": totalDuration.value,
+                "resBody": responseString,
+                "statusCode": res.statusCode,
+              };
+              successRequest.value+=1;
+              print('api Success');
+            },
+            onError: (err,val) {
+              String responseString = val.toString();
+              // print("=99${val.statusCode}");
+              apiDetails?[index]={
+                "urlNumber": (i + 1).toString(),
+                "url": apiData['url'],
+                "requestType":apiData['requestType'],
+                "startTime": apiStartTime.value,
+                "endTime": apiEndTime.value,
+                "duration": totalDuration.value,
+                "resBody": responseString,
+                "statusCode": err=="Response error" ? val.statusCode.toString() : err.toString(),
+              };
+              failedRequest.value+=1;
+              print("-----$err");
+            },
+          );
+        }catch (e) {
+          print(e);
+        }
+        break;
+      default:
+        print('Invalid request type');
+        break;
+    }
+
+  }
 
 
 
