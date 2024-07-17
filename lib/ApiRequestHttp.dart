@@ -23,7 +23,7 @@ class ApiRequestHttp {
     try {
       // print("url:----${url} ---- ${this.queryParams as Map<String, dynamic>}----${this.headers}");
 
-      final finalUrl= Uri.parse(this.url!).replace(queryParameters: queryParams);
+      final finalUrl= Uri.parse(this.url!).replace(queryParameters: queryParams );
       dynamic response = await http.get(finalUrl,headers: headers as Map<String,String>).timeout(Duration(milliseconds: apiTimeOut));
 
       if (response.statusCode==200) {
@@ -70,7 +70,7 @@ class ApiRequestHttp {
       return null;
     } catch (e) {
       print('Uncaught exception: ${e.toString()}');
-      onError?.call(e,"");
+      onError?.call('Uncaught exception',e.toString());
       return null;
     }
     return null;
