@@ -23,7 +23,7 @@ class ApiRequestHttp {
     try {
 
       // print("url:----${url} ---- ${this.queryParams as Map<String, dynamic>}----${this.headers}");
-      final finalUrl= queryParams!.isEmpty ? Uri.parse(this.url!)   : Uri.parse(this.url!).replace(queryParameters: queryParams );
+      final finalUrl= queryParams!.isEmpty ? Uri.parse(url!)   : Uri.parse(url!).replace(queryParameters: queryParams );
       dynamic response = await http.get(finalUrl,headers: headers as Map<String,String>).timeout(Duration(milliseconds: apiTimeOut));
 
       if (response.statusCode==200) {
@@ -84,7 +84,7 @@ class ApiRequestHttp {
   }) async {
     try {
       // print("api call triggered --->" + this.url!);
-      final finalUrl= Uri.parse(this.url!);
+      final finalUrl= Uri.parse(url!);
       dynamic response = await http.post(finalUrl,body: data,headers: headers as Map<String,String>).timeout(Duration(milliseconds: apiTimeOut));
 
       if (response.statusCode==200 || response.statusCode==201) {

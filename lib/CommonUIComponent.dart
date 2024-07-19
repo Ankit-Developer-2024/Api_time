@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class AppUtils{
+class CommonUiComponent{
 
 
     Widget textFormField({
@@ -93,6 +93,9 @@ class AppUtils{
           duration: Duration(milliseconds: durationMilliseconds)
       );
   }
+
+
+
 
 
 }

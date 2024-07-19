@@ -1,4 +1,4 @@
-import 'package:api_time/Utils.dart';
+import 'package:api_time/CommonUIComponent.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:get/get_connect/http/src/multipart/form_data.dart' as get_multipart;
 
@@ -103,13 +103,13 @@ class HomePageController extends GetxController {
         }
         catch(e){
           bodyError.value =true;
-          AppUtils().snackBar(firstTitle:'Body Must be { key:value } and key Must be String ' , secondTitle: e.toString(),maxWidth: Get.width/2,durationMilliseconds: 2000);
+          CommonUiComponent().snackBar(firstTitle:'Body Must be { key:value } and key Must be String ' , secondTitle: e.toString(),maxWidth: Get.width/2,durationMilliseconds: 2000);
         }
     }
 
     if(apiRequestType.value=='POST'){
       if(apiBodyType.value.isEmpty){
-        AppUtils().snackBar(firstTitle: 'API Body Type is required', secondTitle: '', durationMilliseconds: 2000);
+        CommonUiComponent().snackBar(firstTitle: 'API Body Type is required', secondTitle: '', durationMilliseconds: 2000);
         return;
       }
     }
@@ -139,7 +139,7 @@ class HomePageController extends GetxController {
       return Map.fromEntries(queryParams);
     }catch(e){
       queryParamsError.value=true;
-      AppUtils().snackBar(firstTitle: 'Param Must be key=value' , secondTitle: e.toString(),maxWidth: Get.width/2 ,durationMilliseconds: 2000);
+      CommonUiComponent().snackBar(firstTitle: 'Param Must be key=value' , secondTitle: e.toString(),maxWidth: Get.width/2 ,durationMilliseconds: 2000);
       return {};
     }
   }
@@ -152,7 +152,7 @@ class HomePageController extends GetxController {
        return Map.fromEntries(headers);
      }catch(e){
        headerError.value=true;
-       AppUtils().snackBar(firstTitle: 'Headers Must key: value', secondTitle:  e.toString() ,maxWidth: Get.width/2 ,durationMilliseconds: 2000);
+       CommonUiComponent().snackBar(firstTitle: 'Headers Must key: value', secondTitle:  e.toString() ,maxWidth: Get.width/2 ,durationMilliseconds: 2000);
        return {};
      }
   }
@@ -252,7 +252,7 @@ class HomePageController extends GetxController {
           );
           dynamic finalData= apiData['extractData']=='cURL'? apiData["data"] :  apiData['bodyType']=='JSON'? apiData["data"]  : dio.FormData.fromMap(apiData["data"]);
           finalData= apiData['extractData']=='cURL'? apiData['bodyType']=='JSON'? finalData : dio.FormData.fromMap(apiData["data"]) : finalData;
-          print("final--${finalData} ---");
+          print("final--$finalData ---");
 
 
           apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
@@ -321,7 +321,7 @@ class HomePageController extends GetxController {
         }else{
           finalData= apiData['extractData']=='cURL'? apiData["data"] :  apiData['bodyType']=='JSON'? apiData["data"]  : dio.FormData.fromMap(apiData["data"]);
           finalData= apiData['extractData']=='cURL'? apiData['bodyType']=='JSON'? finalData : dio.FormData.fromMap(apiData["data"]) : finalData;
-          print("final--${finalData} ---");
+          print("final--$finalData ---");
         }
 
 
@@ -501,11 +501,11 @@ class HomePageController extends GetxController {
 
 
       RegExp dataRegex = RegExp(r"""(--form|-F)\s+(['"])([\s\S]*?)\2""");
-      Iterable<RegExpMatch> matchesf = dataRegex.allMatches(curlCommand);
+      Iterable<RegExpMatch> matchesForm = dataRegex.allMatches(curlCommand);
 
       Map<String, dynamic> dataMap = {};
      // dynamic formData;
-      for (var match in matchesf) {
+      for (var match in matchesForm) {
 
         String? data = match.group(3);
         if (data != null) {
@@ -582,7 +582,7 @@ class HomePageController extends GetxController {
 
     }catch(e) {
       //print(e);
-      AppUtils().snackBar(firstTitle: 'Please give valid Curl ', secondTitle: curlCommand,maxWidth: Get.width/2  ,durationMilliseconds: 1000);
+      CommonUiComponent().snackBar(firstTitle: 'Please give valid Curl ', secondTitle: curlCommand,maxWidth: Get.width/2  ,durationMilliseconds: 1000);
 
 
     }

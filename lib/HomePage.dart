@@ -2,9 +2,12 @@
 
 import 'package:api_time/HomePageController.dart';
 import 'package:api_time/ResponsePage.dart';
-import 'package:api_time/Utils.dart';
+import 'package:api_time/CommonUIComponent.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import 'AppColors.dart';
+import 'AppCustomDimension.dart';
 
 class HomePage extends StatelessWidget {
    HomePage({super.key});
@@ -40,7 +43,7 @@ class HomePage extends StatelessWidget {
        child: Obx(() {
          return Container(
            color: Colors.white,
-           padding: const EdgeInsets.only(right: 5,left: 5),
+           padding: const EdgeInsets.symmetric(horizontal: px_5),
            child: Container(
              color: const Color.fromRGBO(211, 211, 211, 1),
              child: Column(
@@ -48,40 +51,44 @@ class HomePage extends StatelessWidget {
                  Row(
                    children: [
                      Container(
-                       height: 38,
-                       padding: const EdgeInsets.only(left:5),
-                       color: Colors.blue,
+                       padding: const EdgeInsets.only(left:px_5,top: px_7,bottom:px_7),
+                       decoration: BoxDecoration(
+                           borderRadius: BorderRadius.circular(px_3),
+                           border: Border.all(width: 0.5,color: AppColors.white),
+                           color: Colors.blue,
+                       ),
                        child: DropdownButtonHideUnderline(
                          child: DropdownButton(
                            value:controller.apiMethod.value,
-                           style: const TextStyle(fontSize: 20),
                            dropdownColor: Colors.grey,
                            iconEnabledColor: Colors.white,
                            items:controller.requestMethod.map((String val) {
                              return DropdownMenuItem<String>(
                                value: val,
-                               child: Text(val,style: const TextStyle(color: Colors.white,fontSize: 13)),
+                               child: Text(val,style: const TextStyle(color: AppColors.white,fontSize: textSize_13)),
                              );
                            }).toList(),
                            isDense: true,
-                           padding: const EdgeInsets.only(left: 5),
+                           padding: const EdgeInsets.only(left: px_5),
                            onChanged: (val){
                              controller.apiMethod.value=val!;
-                             print(controller.apiMethod.value);
+
                            },),
                        )
                      ),
                      const SizedBox(width: 5,),
                      ConstrainedBox(
-                       constraints: const BoxConstraints(minWidth:65,maxWidth:100 ,minHeight: 40),
-                       child: AppUtils().button(btnName: 'Add cURL/URL', onTap: (){
+                       constraints: const BoxConstraints(minWidth:65 ,minHeight: 40),
+                       child: CommonUiComponent().button(btnName: 'Add cURL/URL', onTap: (){
                          showDialog(context: context, builder: (context) {
                            return AlertDialog(
+                              backgroundColor:Colors.white ,
+                             surfaceTintColor: Colors.white,
                              scrollable:true ,
-                             title: const Text('Choose cURL or Api Detail',textAlign: TextAlign.center,style: TextStyle(color: Colors.black,fontSize: 20)),
-                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3),),
-                             titlePadding: const EdgeInsets.only(top: 10),
-                             contentPadding: const EdgeInsets.all(10),
+                             title: const Text('Choose cURL or Api Detail',textAlign: TextAlign.center,style: TextStyle(color: AppColors.black,fontSize: textSize_20)),
+                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(px_3),),
+                             titlePadding: const EdgeInsets.only(top: px_10),
+                             contentPadding: const EdgeInsets.all(px_10),
                              content: Obx((){
                                return Column(
                                  mainAxisAlignment: MainAxisAlignment.start,
@@ -96,22 +103,20 @@ class HomePage extends StatelessWidget {
                                              controller.extractData.value='cURL';
                                            },
                                            child: Container(
+                                             padding: const EdgeInsets.all(12.0),
                                              alignment: Alignment.center,
-                                             decoration: BoxDecoration(
-                                               borderRadius: const BorderRadius.only(topRight: Radius.circular(2),topLeft: Radius.circular(2)),
-                                               border: BorderDirectional(
-                                                   top: const BorderSide(color: Colors.grey,width: 1,),
-                                                   end:const BorderSide(color: Colors.grey,width: 1),
-                                                   start: const BorderSide(color: Colors.grey,width: 1),
-                                                   bottom:  controller.extractData.value=='cURL' ?  const BorderSide(color: Colors.grey,width: 0): const BorderSide(color: Colors.grey,width: 1)
+                                             decoration:BoxDecoration(
+                                               color:  controller.extractData.value=='cURL' ? AppColors.white : AppColors.lightGrey,
+                                               border: Border(
+                                                 top: const BorderSide(color: AppColors.grey, width: borderWidth_1,),
+                                                 right: const BorderSide(color: AppColors.grey, width: borderWidth_1,),
+                                                 left:const BorderSide(color: AppColors.grey, width: borderWidth_1,),
+                                                 bottom: controller.extractData.value=='cURL' ? BorderSide.none:const BorderSide(color: AppColors.grey, width: borderWidth_1,),
                                                ),
                                              ),
-                                             child: const Padding(
-                                               padding: EdgeInsets.all(12.0),
-                                               child: Text(
-                                                 'cURL',
-                                                 style: TextStyle(color: Colors.black, fontSize: 13,),
-                                               ),
+                                             child: const Text(
+                                               'cURL',
+                                               style: TextStyle(color: AppColors.black, fontSize: textSize_13,),
                                              ),
                                            ),
                                          )),
@@ -120,22 +125,19 @@ class HomePage extends StatelessWidget {
                                              controller.extractData.value='URL';
                                            },
                                            child: Container(
+                                             padding: const EdgeInsets.all(12.0),
                                              alignment: Alignment.center,
-                                             decoration: BoxDecoration(
-                                               borderRadius:  const BorderRadius.only(topRight: Radius.circular(2),topLeft: Radius.circular(2)),
-                                               border: BorderDirectional(
-                                                   top: const BorderSide(color: Colors.grey,width: 1),
-                                                   end:const BorderSide(color: Colors.grey,width: 1),
-                                                   start: const BorderSide(color: Colors.grey,width: 1),
-                                                   bottom:  controller.extractData.value=='URL' ?  const BorderSide(color: Colors.grey,width: 0): const BorderSide(color: Colors.grey,width: 1)
-                                               ),
-                                             ),
-                                             child: const Padding(
-                                               padding: EdgeInsets.all(12.0),
-                                               child: Text(
-                                                 'Api Detail',
-                                                 style: TextStyle(color: Colors.black, fontSize: 13,),
-                                               ),
+                                             decoration:  BoxDecoration(
+                                               color:  controller.extractData.value=='URL' ? AppColors.white : AppColors.lightGrey,
+                                              border: Border(
+                                                top: const BorderSide(color: AppColors.grey, width: borderWidth_1,),
+                                                right: const BorderSide(color: AppColors.grey, width: borderWidth_1,),
+                                                bottom: controller.extractData.value=='URL' ? BorderSide.none:const BorderSide(color: AppColors.grey, width: borderWidth_1),
+                                                ),
+                                                ),
+                                             child: const Text(
+                                               'Api Detail',
+                                               style: TextStyle(color: AppColors.black, fontSize: textSize_13,),
                                              ),
                                            ),
                                          )),
@@ -156,7 +158,7 @@ class HomePage extends StatelessWidget {
                      const SizedBox(width: 5,),
                      ConstrainedBox(
                        constraints: const BoxConstraints(minWidth:50,maxWidth:100 ,minHeight: 40),
-                       child:AppUtils().button(btnName: 'Clear', onTap: (){
+                       child:CommonUiComponent().button(btnName: 'Clear', onTap: (){
                          controller.urls?.clear();
                          controller.apiDetails?.clear();
                        })
@@ -167,7 +169,7 @@ class HomePage extends StatelessWidget {
                  ),
                  const SizedBox(height: 3,),
                  Container(
-                   color: Colors.grey,
+                   color: AppColors.grey,
                    height: MediaQuery.sizeOf(context).height-105,
                    child: controller.urls == null ? Container() :   ListView.builder(
                        scrollDirection: Axis.vertical,
@@ -176,17 +178,17 @@ class HomePage extends StatelessWidget {
                          dynamic mp=controller.urls![index];
                          return Card(
                            shape: RoundedRectangleBorder(
-                             borderRadius: BorderRadius.circular(2),
+                             borderRadius: BorderRadius.circular(px_2),
                            ),
                            child: ListTile(
-                             leading: Text((index+1).toString(),style: const TextStyle(color: Colors.black,fontSize: 12),),
-                             title: Text(mp['url'],style: const TextStyle(color: Colors.black,fontSize: 12)),
+                             leading: Text((index+1).toString(),style: const TextStyle(color:AppColors.black,fontSize: textSize_13),),
+                             title: Text(mp['url'],style: const TextStyle(color:AppColors.black,fontSize: textSize_13)),
                              subtitle:Column(
                                mainAxisAlignment: MainAxisAlignment.start,
                                crossAxisAlignment: CrossAxisAlignment.start,
                                children: [
-                                 mp['queryParameter'].toString().length==2 ? const SizedBox() : Text("QueryParameter: ${mp['queryParameter'].toString()} ",style: const TextStyle()),
-                                 mp['data']==null ? const SizedBox() : Text("Data: ${mp['data'].toString()}",style: const TextStyle())
+                                 mp['queryParameter'].toString().length==2 ? const SizedBox() : Text("QueryParameter: ${mp['queryParameter'].toString()} ",style: const TextStyle(color:AppColors.black,fontSize: textSize_11)),
+                                 mp['data']==null ? const SizedBox() : Text("Data: ${mp['data'].toString()}",style: const TextStyle(color:AppColors.black,fontSize: textSize_11),)
 
                              ],)
                            ),
@@ -200,19 +202,18 @@ class HomePage extends StatelessWidget {
                        flex: 1,
                          child:  TextField(
                            controller: controller.apiCallCountController,
-                           style: const TextStyle(color: Colors.black,fontSize: 10),
+                           style: const TextStyle(color: AppColors.textFieldTextColor,fontSize: textFieldTextSize),
+                           keyboardType: TextInputType.number,
                            decoration: const InputDecoration(
                              labelText: "Api count ",
-                             labelStyle: TextStyle(color: Colors.black,fontSize: 13),
-                             focusColor: Colors.black,
+                             labelStyle: TextStyle(color: AppColors.textFieldLabel,fontSize: textFieldLabelSize),
                              enabledBorder: OutlineInputBorder(
-                               borderSide: BorderSide(color: Colors.black,width: 1),
-                               borderRadius: BorderRadius.all(Radius.circular(1)),
-
+                               borderSide: BorderSide(color: AppColors.textFieldEnableColor,width: textFieldBorderWidth),
+                               borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                              ),
                              focusedBorder: OutlineInputBorder(
-                               borderSide: BorderSide(color: Colors.black,width: 1),
-                               borderRadius: BorderRadius.all(Radius.circular(1)),
+                               borderSide: BorderSide(color: AppColors.textFieldFocusedColor,width: textFieldBorderWidth),
+                               borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                              ),
                              isDense: true,
                            ),
@@ -228,18 +229,19 @@ class HomePage extends StatelessWidget {
                        flex: 1,
                        child: TextField(
                        controller: controller.timeOutController,
-                       style: const TextStyle(color: Colors.black,fontSize: 10),
+                       style: const TextStyle(color:AppColors.textFieldTextColor,fontSize: textFieldTextSize),
+                       keyboardType: TextInputType.number,
                        decoration: const InputDecoration(
                          labelText: "Api timeout(millisec)",
-                         labelStyle: TextStyle(color: Colors.black,fontSize: 13),
+                         labelStyle: TextStyle(color: AppColors.textFieldLabel,fontSize: textFieldLabelSize),
                          focusColor: Colors.black,
                          enabledBorder: OutlineInputBorder(
-                           borderSide: BorderSide(color: Colors.black,width: 1),
-                           borderRadius: BorderRadius.all(Radius.circular(1)),
+                           borderSide: BorderSide(color: AppColors.textFieldEnableColor,width: textFieldBorderWidth),
+                           borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                          ),
                          focusedBorder: OutlineInputBorder(
-                           borderSide: BorderSide(color: Colors.black,width: 1),
-                           borderRadius: BorderRadius.all(Radius.circular(1)),
+                           borderSide: BorderSide(color: AppColors.textFieldFocusedColor,width: textFieldBorderWidth),
+                           borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                          ),
                          isDense: true,
                        ),
@@ -249,18 +251,18 @@ class HomePage extends StatelessWidget {
                        flex: 1,
                        child: TextField(
                        controller: controller.apiIntervalController,
-                       style: const TextStyle(color: Colors.black,fontSize: 10),
+                       style: const TextStyle(color: AppColors.textFieldTextColor,fontSize: textFieldTextSize),
+                       keyboardType: TextInputType.number,
                        decoration: const InputDecoration(
                          labelText: "Interval (millisec)",
-                         labelStyle: TextStyle(color: Colors.black,fontSize: 13),
-                         focusColor: Colors.black,
+                         labelStyle: TextStyle(color: AppColors.textFieldLabel,fontSize: textFieldLabelSize),
                          enabledBorder: OutlineInputBorder(
-                           borderSide: BorderSide(color: Colors.black,width: 1),
-                           borderRadius: BorderRadius.all(Radius.circular(1)),
+                           borderSide: BorderSide(color: AppColors.textFieldEnableColor,width: textFieldBorderWidth),
+                           borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                          ),
                          focusedBorder: OutlineInputBorder(
-                           borderSide: BorderSide(color: Colors.black,width: 1),
-                           borderRadius: BorderRadius.all(Radius.circular(1)),
+                           borderSide: BorderSide(color: AppColors.textFieldFocusedColor,width: textFieldBorderWidth),
+                           borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                          ),
                          isDense: true,
                        ),
@@ -271,38 +273,26 @@ class HomePage extends StatelessWidget {
                        },
 
                      ),),
-                     const SizedBox(width: 3,),
+                     const SizedBox(width: px_3,),
                      Expanded(
                          flex: 1,
                          child: ConstrainedBox(
                            constraints: const BoxConstraints(minHeight: 40),
-                           child: OutlinedButton(
+                           child:CommonUiComponent().button(btnName: 'Submit',
+                               onTap: (){
+                                 controller.apiDetails?.clear();
+                                 controller.successRequest.value=0;
+                                 controller.failedRequest.value=0;
+                                 if(controller.urls!= null && controller.urls!.isNotEmpty){
+                                   controller.api();
+                                 }
+                                 else{
 
-                           onPressed: () async {
+                                   CommonUiComponent().snackBar(firstTitle: 'Please add at least one cURL or URL', secondTitle: "");
 
+                                 }
+                           }),
 
-
-                             controller.apiDetails?.clear();
-                             controller.successRequest.value=0;
-                             controller.failedRequest.value=0;
-                             if(controller.urls!= null && controller.urls!.isNotEmpty){
-                               controller.api();
-                             }
-                             else{
-
-                               AppUtils().snackBar(firstTitle: 'Please add at least one cURL or URL', secondTitle: "");
-
-                             }
-                           },
-                           style: OutlinedButton.styleFrom(
-                             backgroundColor: Colors.blue,
-                             side: const BorderSide(color: Colors.white, width: 0.5), // Border color and width
-                             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0), // Padding inside the button
-                             shape: RoundedRectangleBorder(
-                               borderRadius: BorderRadius.circular(2), // Rounded corners
-                             ),
-                           ),
-                           child: const Text("Submit",style: TextStyle(color: Colors.white,fontSize: 13),)),
                          )
                      )
                    ],
@@ -330,7 +320,7 @@ Widget rightSideApiDetails(HomePageController controller,BuildContext context){
     flex: 4,
     child:  Obx(() {
       return Container(
-        color: Colors.black,
+        color: AppColors.black,
         child: Column(
           mainAxisAlignment:  MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -340,63 +330,56 @@ Widget rightSideApiDetails(HomePageController controller,BuildContext context){
               children: [
                 Row(
                   children: [
-                    ElevatedButton(onPressed: (){},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        side: const BorderSide(color: Colors.black, width: 0), // Border color and width
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0), // Padding inside the button
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(2), // Rounded corners
-                        ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: px_5,vertical:px_6),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(px_3),
+                        border: Border.all(color: AppColors.black, width: px_1),
+                        color: AppColors.blue,
                       ),
-                      child: Text('Total Request: ${controller.apiDetails!.length.toString()}',style: const TextStyle(color: Colors.white,fontSize: 13),),
+
+                      child: Text('Total Request: ${controller.apiDetails!.length.toString()}', style: const TextStyle(color: AppColors.white, fontSize: textSize_13),),
                     ),
-                    ElevatedButton(onPressed: (){},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          side: const BorderSide(color: Colors.black, width: 0), // Border color and width
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0), // Padding inside the button
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2), // Rounded corners
-                          ),
-                        ),
-                        child: Text('Success Request: ${controller.successRequest.value}',style: const TextStyle(color: Colors.white,fontSize: 13))),
-                    ElevatedButton(onPressed: (){},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          side: const BorderSide(color: Colors.black, width: 0), // Border color and width
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0), // Padding inside the button
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2), // Rounded corners
-                          ),
-                        ),
-                        child: Text('Failed Request: ${controller.failedRequest.value}',style: const TextStyle(color: Colors.white,fontSize: 13))),
-                    ElevatedButton(onPressed: (){},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orangeAccent,
-                          side: const BorderSide(color: Colors.black, width: 0), // Border color and width
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0), // Padding inside the button
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2), // Rounded corners
-                          ),
-                        ),
-                        child: Text('Completed Request: ${controller.successRequest.value+controller.failedRequest.value}',style: const TextStyle(color: Colors.white,fontSize: 13))),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: px_5,vertical:px_6),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(px_3),
+                        border: Border.all(color: AppColors.black, width: px_1),
+                        color: AppColors.green,
+                      ),
+
+                      child: Text('Success Request: ${controller.successRequest.value}', style: const TextStyle(color: AppColors.white, fontSize: textSize_13),),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: px_5,vertical:px_6),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(px_3),
+                        border: Border.all(color: AppColors.black, width: px_1),
+                        color: AppColors.red,
+                      ),
+
+                      child: Text('Failed Request: ${controller.failedRequest.value}', style: const TextStyle(color: AppColors.white, fontSize: textSize_13),),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: px_5,vertical:px_6),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(px_3),
+                        border: Border.all(color: AppColors.black, width: px_1),
+                        color: AppColors.orangeAccent,
+                      ),
+
+                      child: Text('Completed Request: ${controller.successRequest.value+controller.failedRequest.value}', style: const TextStyle(color: AppColors.white, fontSize: textSize_13),),
+                    ),
+
                   ],
                 ),
-                ElevatedButton(onPressed: (){
-                  controller.apiDetails?.clear();
-                  controller.successRequest.value=0;
-                  controller.failedRequest.value=0;
-                },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      side: const BorderSide(color: Colors.black, width: 0), // Border color and width
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0), // Padding inside the button
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(2), // Rounded corners
-                      ),
-                    ),
-                    child: const Text('Clear',style: TextStyle(color: Colors.white,fontSize: 13))),
+                   CommonUiComponent().button(btnName: 'Clear', textColor: AppColors.white ,fontSize: textSize_13,borderColor: AppColors.black ,
+                    onTap: (){
+                      controller.apiDetails?.clear();
+                      controller.successRequest.value=0;
+                      controller.failedRequest.value=0;
+                    }),
+
               ],
             ),
             controller.apiDetails == null ? Container() : SizedBox(
@@ -407,14 +390,14 @@ Widget rightSideApiDetails(HomePageController controller,BuildContext context){
                     dynamic mp=controller.apiDetails![index];
                     dynamic input=controller.urls?[int.parse(mp['urlNumber'])-1];
                     return Container(
-                      margin: const EdgeInsets.all(5),
-                      padding: const EdgeInsets.all(3),
+                      margin: const EdgeInsets.all(px_5),
+                      padding: const EdgeInsets.all(px_3),
                       decoration:BoxDecoration(
                         border: Border.all(
-                          width: 1.0,
-                          color: Colors.white
+                          width: px_1,
+                          color: AppColors.white
                         ),
-                        borderRadius: BorderRadius.circular(2.0), // Uniform radius
+                        borderRadius: BorderRadius.circular(px_2), // Uniform radius
                       ),
                       child: Column(
 
@@ -423,31 +406,31 @@ Widget rightSideApiDetails(HomePageController controller,BuildContext context){
                             mainAxisAlignment:  MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Index: ${mp['urlNumber']} | Api Index: ${mp['apiIndex']} |',style: const TextStyle(color: Colors.white,fontSize: 13),),
-                              Text('RequestType: ${mp['requestType']} | ',style: const TextStyle(color: Colors.white,fontSize: 13),),
+                              Text('Index: ${mp['urlNumber']} | Api Index: ${mp['apiIndex']} |',style: const TextStyle(color: AppColors.white,fontSize: textSize_13),),
+                              Text('RequestType: ${mp['requestType']} | ',style: const TextStyle(color: AppColors.white,fontSize: 13),),
                               Row(
                                 children: [
-                                  const Text('Total Time: ',style: TextStyle(color: Colors.white,fontSize: 13),),
+                                  const Text('Total Time: ',style: TextStyle(color: Colors.white,fontSize: textSize_13),),
                                   mp['duration']=='Loader' ?
                                      Container(
                                       width: 10,
                                       height: 10,
-                                      margin: const EdgeInsets.only(top:4,left: 4),
+                                      margin: const EdgeInsets.only(top:px_4,left: px_4),
                                       child: const CircularProgressIndicator(strokeWidth: 2,))
-                                      :Text('${mp['duration']} millisec',style: const TextStyle(color: Colors.white,fontSize: 13),),
-                                      const Text(' | ',style: TextStyle(color: Colors.white,fontSize: 13),),
+                                      :Text('${mp['duration']} millisec',style: const TextStyle(color: Colors.white,fontSize: textSize_13),),
+                                      const Text(' | ',style: TextStyle(color: Colors.white,fontSize: textSize_13),),
                                 ],
                               ),
                               Row(
                                 children: [
-                                  Text("Status: ",style: TextStyle(color: mp['statusCode']=='Loader' ? Colors.white : mp['statusCode']==200 ? Colors.green : mp['statusCode']==201 ? Colors.green  : Colors.red,fontSize: 13)),
+                                  Text("Status: ",style: TextStyle(color: mp['statusCode']=='Loader' ? Colors.white : mp['statusCode']==200 ? AppColors.green : mp['statusCode']==201 ? AppColors.green  : AppColors.red,fontSize: textSize_13)),
                                   mp['statusCode']=='Loader' ?
                                       Container(
-                                      width: 10,
-                                      height: 10,
+                                      width: px_10,
+                                      height: px_10,
                                       margin: const EdgeInsets.only(top:4,left: 4),
                                       child: const CircularProgressIndicator(strokeWidth: 2,))
-                                      :Text('${mp['statusCode']} ',style: TextStyle(color: mp['statusCode']==200 ? Colors.green : mp['statusCode']==201 ? Colors.green : Colors.red,fontSize: 13,),),
+                                      :Text('${mp['statusCode']} ',style: TextStyle(color: mp['statusCode']==200 ? AppColors.green : mp['statusCode']==201 ? AppColors.green : AppColors.red,fontSize: textSize_13,),),
                                 ],
                               ),
                             ],
@@ -456,21 +439,21 @@ Widget rightSideApiDetails(HomePageController controller,BuildContext context){
                             mainAxisAlignment:  MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('URL: ${mp['url']}',style: const TextStyle(color: Colors.white,fontSize: 13),),
+                              Text('URL: ${mp['url']}',style: const TextStyle(color: Colors.white,fontSize: textSize_13),),
                               const SizedBox(width: 5,),
                               GestureDetector(
                                   onTap: (){
 
-                                    mp['resBody']=='Loader' ? AppUtils().snackBar(firstTitle:'Try to Fetch data',secondTitle: '' )
+                                    mp['resBody']=='Loader' ? CommonUiComponent().snackBar(firstTitle:'Try to Fetch data',secondTitle: '' )
                                                             : Get.to(duration: const Duration(seconds: 1), ResponsePage(response:mp['resBody'],mp: input,));
                                   },
                                   child:  mp['resBody']=='Loader' ?
                                                       Container(
-                                                          width: 10,
-                                                          height: 10,
-                                                          margin: const EdgeInsets.only(top:4,left: 4),
+                                                          width: px_10,
+                                                          height: px_10,
+                                                          margin: const EdgeInsets.only(top:px_4,left: px_4),
                                                           child: const CircularProgressIndicator(strokeWidth: 2,))
-                                                      :  const Text('View Response ',style: TextStyle(fontSize: 13,color: Colors.blue)),
+                                                      :  const Text('View Response ',style: TextStyle(fontSize: textSize_13,color: AppColors.blue)),
                               ),
 
                             ],
@@ -504,20 +487,19 @@ Widget addCurl(HomePageController controller,BuildContext context){
             controller: controller.cURLController,
             minLines: 10,
             maxLines: 10,
-            style: const TextStyle(color: Colors.black,fontSize: 10),
+            style: const TextStyle(color:AppColors.textFieldTextColor,fontSize: textFieldTextSize),
             decoration: const InputDecoration(
               labelText: "Your cURL here ",
               hintText: "More than one cURL must be separated by @@%",
               alignLabelWithHint: true,
-              labelStyle: TextStyle(color: Colors.black,fontSize: 13),
-              focusColor: Colors.black,
+              labelStyle: TextStyle(color: AppColors.textFieldLabel,fontSize: textFieldLabelSize),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black,width: 1),
-                borderRadius: BorderRadius.all(Radius.circular(1)),
+                borderSide: BorderSide(color: AppColors.textFieldEnableColor,width: textFieldBorderWidth),
+                borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.black,width: 1),
-                borderRadius: BorderRadius.all(Radius.circular(1)),
+                borderSide: BorderSide(color: AppColors.textFieldFocusedColor,width: textFieldBorderWidth),
+                borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
               ),
               isDense: true,
             ),
@@ -534,7 +516,7 @@ Widget addCurl(HomePageController controller,BuildContext context){
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppUtils().button(btnName: 'Add' ,bgColor:   controller.cURLError.value ? Colors.grey : Colors.blue ,  onTap: (){
+            CommonUiComponent().button(btnName: 'Add' ,bgColor:   controller.cURLError.value ? AppColors.grey : AppColors.blue ,  onTap: (){
 
               if(controller.cURLController.text.isNotEmpty ){
                 controller.setData();
@@ -544,7 +526,7 @@ Widget addCurl(HomePageController controller,BuildContext context){
 
             }),
             const SizedBox(width: 5,),
-            AppUtils().button(btnName: 'Close'  ,  onTap: (){
+             CommonUiComponent().button(btnName: 'Close'  ,  onTap: (){
               Navigator.pop(context);
             })
           ],)
@@ -576,7 +558,7 @@ Widget addUrl(HomePageController controller,BuildContext context){
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Request Type:',style: TextStyle(fontSize: 13,color: Colors.black),),
+                      const Text('Request Type:',style: TextStyle(fontSize: textSize_13,color: AppColors.black),),
                       const SizedBox(width: 5,),
                       Container(
                         color: Colors.grey,
@@ -585,7 +567,7 @@ Widget addUrl(HomePageController controller,BuildContext context){
                           items:controller.requestType.map((String val) {
                             return DropdownMenuItem<String>(
                               value: val,
-                              child: Text(val,style: const TextStyle(color: Colors.black,fontSize: 13)),
+                              child: Text(val,style: const TextStyle(color: AppColors.black,fontSize: textSize_13)),
                             );
                           }).toList(),
                           isDense: true,
@@ -597,6 +579,9 @@ Widget addUrl(HomePageController controller,BuildContext context){
                             controller.headersController.clear();
                             controller.queryParamsController.clear();
                             controller.bodyController.clear();
+                            controller.postRequestError.value=false;
+                            controller.putRequestError.value=false;
+                            controller.putPostHeaderError.value=false;
                           },),
                       ),
                     ],
@@ -605,27 +590,28 @@ Widget addUrl(HomePageController controller,BuildContext context){
                   TextFormField(
                     controller: controller.urlController,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
-                    style: const TextStyle(color: Colors.black,fontSize: 10),
+                    style: const TextStyle(color: AppColors.textFieldTextColor,fontSize: textFieldTextSize),
                     decoration:  const InputDecoration(
                       labelText: 'URL',
                       alignLabelWithHint: true,
-                      labelStyle: TextStyle(color: Colors.black,fontSize: 13),
+                      labelStyle: TextStyle(color: AppColors.textFieldLabel,fontSize: textFieldLabelSize),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color: AppColors.textFieldEnableColor,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide( color: AppColors.textFieldFocusedColor,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color: AppColors.textFieldFocusedErrorBorder,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
                       errorBorder:OutlineInputBorder(
-                        borderSide: BorderSide(width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color: AppColors.textFieldErrorBorder,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
+                      errorStyle: TextStyle(color: AppColors.textFieldErrorText,fontSize: textFieldErrorTextSize),
                       isDense: true,
                     ),
                     validator: (val){
@@ -639,37 +625,37 @@ Widget addUrl(HomePageController controller,BuildContext context){
                   TextFormField(
                     controller: controller.headersController,
                     autovalidateMode: AutovalidateMode.always,
-                    minLines: 3,
-                    maxLines: 5,
-                    style: const TextStyle(color: Colors.black,fontSize: 10),
+                    minLines: 5,
+                    maxLines: 10,
+                    style: const TextStyle(color: AppColors.textFieldTextColor,fontSize: textFieldTextSize),
                     decoration:  const InputDecoration(
                       labelText: 'Header',
                       hintText: "Please give header \nkey: value\nkey2: value2",
                       alignLabelWithHint: true,
-                      labelStyle: TextStyle(color: Colors.black,fontSize: 13),
-                      focusColor: Colors.black,
+                      labelStyle: TextStyle(color: AppColors.textFieldLabel,fontSize: textFieldLabelSize),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black,width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color: AppColors.textFieldEnableColor,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black,width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color: AppColors.textFieldFocusedColor,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black,width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color: AppColors.textFieldFocusedErrorBorder,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
                       errorBorder:OutlineInputBorder(
-                        borderSide: BorderSide(width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color: AppColors.textFieldErrorBorder,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
+                      errorStyle: TextStyle(color: AppColors.textFieldErrorText,fontSize: textFieldErrorTextSize,),
                       isDense: true,
                     ),
                     validator: (val){
                       if(val!.isNotEmpty){
                         if((controller.apiBodyType.value=="JSON"&&!val.contains('Content-Type: application/json'))||(controller.apiBodyType.value=="JSON"&&val.isEmpty)) {
-                          return "Your body is JSON ,So you also need to give  Content-Type: application/json  header";
+                           return "Your body is JSON ,So you also need to give  Content-Type: application/json  header";
                         }
                       }
                       return null;
@@ -681,31 +667,31 @@ Widget addUrl(HomePageController controller,BuildContext context){
                     },
                   ),
                   const SizedBox(height: 5,),
-                controller.putPostHeaderError.value ? const Text("Your body is JSON ,So you also need to give  Content-Type: application/json  header",style: TextStyle(color: Colors.red,fontSize: 13),)  : const SizedBox(),
+                controller.putPostHeaderError.value ? const SelectableText("Your body is JSON ,So you also need to give  Content-Type: application/json  header",style: TextStyle(color: AppColors.textFieldErrorText,fontSize: textFieldErrorTextSize),)  : const SizedBox(),
                   controller.apiRequestType.value=='POST' ?  Container() :  TextFormField(
                     controller: controller.queryParamsController,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
-                    style: const TextStyle(color: Colors.black,fontSize: 10),
-                    minLines: 3,
-                    maxLines: 5,
+                    style: const TextStyle(color: AppColors.textFieldTextColor,fontSize: textFieldTextSize),
+                    minLines: 5,
+                    maxLines: 10,
                     decoration:  const InputDecoration(
                       labelText: 'Query Parameters',
                       hintText: "Please give Query Parameters \nkey=value\nkey2=value2",
                       alignLabelWithHint: true,
-                      labelStyle: TextStyle(color: Colors.black,fontSize: 13),
-                      focusColor: Colors.black,
+                      labelStyle: TextStyle(color: AppColors.textFieldLabel,fontSize: textFieldLabelSize),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black,width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color: AppColors.textFieldEnableColor,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black,width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color: AppColors.textFieldFocusedColor,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black,width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color: AppColors.textFieldFocusedErrorBorder,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
+                      errorStyle: TextStyle(color: AppColors.textFieldErrorText,fontSize: textFieldErrorTextSize),
                       isDense: true,
                     ),
                       onChanged: (val){
@@ -716,49 +702,50 @@ Widget addUrl(HomePageController controller,BuildContext context){
                   ),
                   const SizedBox(height: 5,),
                   controller.apiRequestType.value=='GET'|| controller.apiRequestType.value=='DELETE' ? Container(): Row(children: [
-                    AppUtils().button(btnName: 'Form-Data', textColor: controller.apiBodyType.value=='Form-Data'? Colors.white  : Colors.black , bgColor:controller.apiBodyType.value=='Form-Data'? Colors.green  : Colors.transparent ,borderColor:controller.apiBodyType.value=='Form-Data'? Colors.white : Colors.black,onTap: (){
+                    CommonUiComponent().button(btnName: 'Form-Data', textColor: controller.apiBodyType.value=='Form-Data'? AppColors.white  : AppColors.black , bgColor:controller.apiBodyType.value=='Form-Data'? AppColors.green  : AppColors.transparent ,borderColor:controller.apiBodyType.value=='Form-Data'? AppColors.white : AppColors.black,onTap: (){
                       controller.apiBodyType.value='Form-Data';
                       controller.postRequestError.value=false;
                       controller.putRequestError.value=false;
                       controller.putPostHeaderError.value=false;
                     }),
                     const SizedBox(width: 5,),
-                    AppUtils().button(btnName: 'JSON', textColor: controller.apiBodyType.value=='JSON'? Colors.white  : Colors.black,bgColor:controller.apiBodyType.value=='JSON'? Colors.green  : Colors.transparent ,borderColor: controller.apiBodyType.value=='JSON'? Colors.white : Colors.black,  onTap: (){
+                    CommonUiComponent().button(btnName: 'JSON', textColor: controller.apiBodyType.value=='JSON'? AppColors.white  : AppColors.black,bgColor:controller.apiBodyType.value=='JSON'? AppColors.green  : AppColors.transparent ,borderColor: controller.apiBodyType.value=='JSON'? AppColors.white : AppColors.black,  onTap: (){
                       controller.apiBodyType.value='JSON';
                       controller.postRequestError.value=false;
                       controller.putRequestError.value=false;
                     })
                   ],),
                   const SizedBox(height: 5,),
-                  controller.postRequestError.value ? const Text('Body type is required',textAlign: TextAlign.left,style: TextStyle(color: Colors.red,fontSize: 13,),):const SizedBox(),
-                  controller.putRequestError.value ? const Text('Please give QueryParams or Body',textAlign: TextAlign.left,style: TextStyle(color: Colors.red,fontSize: 13,),):const SizedBox(),
+                  controller.postRequestError.value ? const Text('Body type is required',textAlign: TextAlign.left,style: TextStyle(color: AppColors.textFieldErrorText,fontSize: textFieldErrorTextSize,),):const SizedBox(),
+                  controller.putRequestError.value ? const Text('Please give QueryParams or Body',textAlign: TextAlign.left,style: TextStyle(color: AppColors.textFieldErrorText,fontSize: textFieldErrorTextSize,),):const SizedBox(),
                   controller.apiBodyType.value.isEmpty? const SizedBox() :  controller.apiRequestType.value=='GET'||controller.apiRequestType.value=='DELETE' ? Container() :TextFormField(
                     controller: controller.bodyController,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
-                    style: const TextStyle(color: Colors.black,fontSize: 10),
-                    minLines: 3,
+                    style: const TextStyle(color: AppColors.textFieldTextColor,fontSize: textFieldTextSize),
+                    minLines: 5,
                     maxLines: 10,
                     decoration:  const InputDecoration(
                       labelText: 'Body',
                       hintText: "Please give Body \n{ \n key:value,\n key:value \n}",
                       alignLabelWithHint: true,
-                      labelStyle: TextStyle(color: Colors.black,fontSize: 13),
+                      labelStyle: TextStyle(color: AppColors.textFieldLabel,fontSize: textFieldLabelSize),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color:AppColors.textFieldEnableColor, width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color: AppColors.textFieldFocusedColor,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color: AppColors.textFieldFocusedErrorBorder,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
                       errorBorder:OutlineInputBorder(
-                        borderSide: BorderSide(width: 1),
-                        borderRadius: BorderRadius.all(Radius.circular(1)),
+                        borderSide: BorderSide(color: AppColors.textFieldErrorBorder,width: textFieldBorderWidth),
+                        borderRadius: BorderRadius.all(Radius.circular(textFieldBorderRadius)),
                       ),
+                      errorStyle: TextStyle(color: AppColors.textFieldErrorText,fontSize: textFieldErrorTextSize),
                       isDense: true,
                     ),
                     validator: (val){
@@ -778,10 +765,9 @@ Widget addUrl(HomePageController controller,BuildContext context){
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppUtils().button(btnName: 'Add' , onTap: (){
+            CommonUiComponent().button(btnName: 'Add' , onTap: (){
               if(!formKey.currentState!.validate()){
                 return;
-
               }
               else if((controller.apiRequestType.value=='POST'||controller.apiRequestType.value=='PUT') && (controller.apiBodyType.value=='JSON') && !controller.headersController.text.contains('Content-Type: application/json') ){
                 controller.putPostHeaderError.value=true;
@@ -799,7 +785,7 @@ Widget addUrl(HomePageController controller,BuildContext context){
               }
             }),
             const SizedBox(width: 5,),
-            AppUtils().button(btnName: 'Close'  ,  onTap: (){
+            CommonUiComponent().button(btnName: 'Close'  ,  onTap: (){
               Navigator.pop(context);
             })
           ],

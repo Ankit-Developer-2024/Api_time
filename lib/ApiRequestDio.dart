@@ -12,11 +12,11 @@ class ApiRequest {
   ApiRequest({required this.url, this.data, this.apiTimeOut, required this.headers,this.queryParams});
 
   Dio _dio() {
-    print('===${headers}');
+    print('===$headers');
     var options = BaseOptions(
-      headers: headers as Map<String, dynamic>,
-      connectTimeout: Duration(milliseconds: this.apiTimeOut),
-      receiveTimeout: Duration(milliseconds: this.apiTimeOut),
+      headers: headers,
+      connectTimeout: Duration(milliseconds: apiTimeOut),
+      receiveTimeout: Duration(milliseconds: apiTimeOut),
     );
     var dio = Dio(options);
 
