@@ -1,7 +1,7 @@
 
 
-import 'package:api_time/HomePageController.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class AppUtils{
 
@@ -46,10 +46,10 @@ class AppUtils{
     double fontSize=13,
     Color textColor=Colors.white,
     Color bgColor=Colors.blue,
-    Color borderColor=Colors.black,
-    double borderWidth=1,
-    double horizontalPadding=15,
-    double verticalPadding=5,
+    Color borderColor=Colors.white,
+    double borderWidth=0.5,
+    double horizontalPadding=0,
+    double verticalPadding=0,
     double borderRadius=3,
 
   }){
@@ -57,16 +57,41 @@ class AppUtils{
         onPressed: onTap,
         style: OutlinedButton.styleFrom(// Text color// Background color
           backgroundColor: bgColor,
-          side: const BorderSide(color: Colors.white, width: 0.5), // Border color and width
-          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0), // Padding inside the button
+          side:  BorderSide(color: borderColor, width: borderWidth), // Border color and width
+          padding:  EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding), // Padding inside the button
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(2), // Rounded corners
+            borderRadius: BorderRadius.circular(borderRadius), // Rounded corners
           ),
         ),
-        child: Text(
-          btnName,
-          style: TextStyle(color: textColor, fontSize: fontSize),
+        child: Container(
+          margin: const EdgeInsets.only(left: 5,right:5),
+          child: Text(
+            btnName,
+            style: TextStyle(color: textColor, fontSize: fontSize),
+          ),
         ));
+  }
+
+  SnackbarController snackBar({
+          required String firstTitle,
+          required String secondTitle,
+          double maxWidth = 400,
+          Color bgColor=Colors.white,
+          Color textColor=Colors.black,
+          int durationMilliseconds =800,
+        }
+
+      ){
+      return  Get.snackbar(
+          firstTitle,secondTitle,
+          maxWidth:maxWidth,
+          backgroundColor: bgColor,
+          colorText: textColor,
+          snackPosition:SnackPosition.BOTTOM,
+          borderRadius:2,
+          margin:const EdgeInsets.only(bottom: 10),
+          duration: Duration(milliseconds: durationMilliseconds)
+      );
   }
 
 

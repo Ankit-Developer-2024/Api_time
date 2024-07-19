@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:dio/dio.dart';
 Future<void> callApiFromCurl(String curlCommand) async {
   print('curl');
   // Extracting URL
@@ -14,6 +14,7 @@ Future<void> callApiFromCurl(String curlCommand) async {
     r"""curl\s+(?:--location\s+)?(?:-[LX]|--location|--location\s+--request|--request|\s+(GET|POST|PUT|DELETE))?\s*(GET|POST|PUT|DELETE)?\s*['"]?([^'"\s]+)['"]?""",
     caseSensitive: true,
  );
+
   String? url;
   List l=[];
   l.add(curlCommand);

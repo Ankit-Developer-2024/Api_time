@@ -30,6 +30,7 @@ class ApiRequest {
     Function(dynamic error,dynamic val)? onError,
   }) async {
     try {
+
       // print("url:----${url} ---- ${this.queryParams as Map<String, dynamic>}----${this.headers}");
       dynamic response = await _dio().get(url!, queryParameters: queryParams as Map<String, dynamic>, );
 
@@ -87,6 +88,7 @@ class ApiRequest {
     Function(dynamic error,dynamic val)? onError,
   }) async {
     try {
+
      // print("api call triggered --->" + this.url!);
       dynamic response = await _dio().post(url!, data: data);
       if (response != null) {
@@ -137,7 +139,8 @@ class ApiRequest {
     Function(dynamic error,dynamic val)? onError,
   }) async {
     try {
-      dynamic response = await _dio().delete(url!, queryParameters: this.data);
+
+      dynamic response = await _dio().delete(url!,data: data, queryParameters: queryParams as Map<String, dynamic> );
       if (response != null) {
         onSuccess?.call(response);
       } else {
@@ -186,8 +189,8 @@ class ApiRequest {
     Function(dynamic error,dynamic val)? onError,
   }) async {
     try {
-      print("PUT:$data");
-      dynamic response = await _dio().put(url!, data: data, queryParameters: queryParams);
+      print("qq$queryParams");
+      dynamic response = await _dio().put(url! , queryParameters: queryParams);
       if (response != null) {
         onSuccess?.call(response);
       } else {
@@ -220,7 +223,7 @@ class ApiRequest {
       } else if (e.type == DioExceptionType.unknown) {
         // Other errors, such as network issues or DNS lookup failures
         print('Other error: ${e.message}');
-        onError?.call("Other error",e.message);
+        onError?.call("Other  error",e.message);
         return null;
       }
     } catch (e) {

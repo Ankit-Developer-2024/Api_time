@@ -1,16 +1,18 @@
+import 'package:api_time/Utils.dart';
+import 'package:dio/dio.dart' as dio;
+import 'package:get/get_connect/http/src/multipart/form_data.dart' as get_multipart;
 
 import 'dart:convert';
 
 import 'package:api_time/ApiRequestDio.dart';
 import 'package:api_time/ApiRequestHttp.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 
 
 class HomePageController extends GetxController {
-  GlobalKey formKey = GlobalKey<FormState>();
+
   TextEditingController urlController=TextEditingController();
   TextEditingController headersController = TextEditingController();
   TextEditingController queryParamsController = TextEditingController();
@@ -24,6 +26,15 @@ class HomePageController extends GetxController {
   TextEditingController apiIntervalController = TextEditingController(
       text: '0');
 
+  RxBool headerError=false.obs;
+  RxBool queryParamsError=false.obs;
+  RxBool bodyError=false.obs;
+
+  RxBool cURLError=true.obs;
+  RxBool postRequestError=false.obs;
+  RxBool putRequestError=false.obs;
+  RxBool putPostHeaderError=false.obs;
+
 
   List<String> requestMethod=['Dio','Http'];
   List<String> requestType=['GET','POST','DELETE','PUT'];
@@ -33,6 +44,8 @@ class HomePageController extends GetxController {
   RxInt apiTimeOut = 30000.obs;
   RxString apiMethod="Dio".obs;
   RxString apiRequestType="GET".obs;
+  RxString apiBodyType = ''.obs;
+  RxString extractData='cURL'.obs;
 
   RxInt apiCallCount = 1.obs;
   RxInt apiInterval = 0.obs;
@@ -80,28 +93,68 @@ class HomePageController extends GetxController {
   void setData2(){
     final queryParams = parseQueryParams(queryParamsController.text);
     final headers = parseHeaders(headersController.text);
+    bodyError.value =false;
     final body = bodyController.text;
     dynamic jsonBody ;
     if(body.isNotEmpty){
-      jsonBody= json.decode(body);
+        try{
+          jsonBody= json.decode(body);
+          bodyError.value =false;
+        }
+        catch(e){
+          bodyError.value =true;
+          AppUtils().snackBar(firstTitle:'Body Must be { key:value } and key Must be String ' , secondTitle: e.toString(),maxWidth: Get.width/2,durationMilliseconds: 2000);
+        }
+    }
+
+    if(apiRequestType.value=='POST'){
+      if(apiBodyType.value.isEmpty){
+        AppUtils().snackBar(firstTitle: 'API Body Type is required', secondTitle: '', durationMilliseconds: 2000);
+        return;
+      }
+    }
+
+    if(queryParamsError.value==false&&headerError.value==false&&bodyError.value==false){
+
+      urls?.add({'url':urlController.text,'queryParameter':queryParams,'data':jsonBody,'bodyType':apiBodyType.value , 'requestType':apiRequestType.value, 'headers':headers,"extractData":extractData.value});
+      Get.back();
+      urlController.text='';
+      headersController.text='';
+      queryParamsController.text='';
+      bodyController.text='';
+
+    }else{
+
     }
 
 
-    urls?.add({'url':urlController.text,'queryParameter':queryParams,'data':jsonBody,'requestType':apiRequestType.value, 'headers':headers});
-    print(urls);
 
   }
 
   Map<String, dynamic> parseQueryParams(String queryParamsString) {
-    if (queryParamsString.isEmpty) return {};
-    final queryParams = queryParamsString.split('\n').map((item) => item.split('=')).map((pair) => MapEntry(pair[0], pair[1])).toList();
-    return Map.fromEntries(queryParams);
+    try{
+      if (queryParamsString.isEmpty) return {};
+      final queryParams = queryParamsString.split('\n').map((item) => item.split('=')).map((pair) => MapEntry(pair[0], pair[1])).toList();
+      queryParamsError.value=false;
+      return Map.fromEntries(queryParams);
+    }catch(e){
+      queryParamsError.value=true;
+      AppUtils().snackBar(firstTitle: 'Param Must be key=value' , secondTitle: e.toString(),maxWidth: Get.width/2 ,durationMilliseconds: 2000);
+      return {};
+    }
   }
 
   Map<String, String> parseHeaders(String headersString) {
-    if (headersString.isEmpty) return {};
-    final headers = headersString.split('\n').map((item) => item.split(': ')).map((pair) => MapEntry(pair[0], pair[1])).toList();
-    return Map.fromEntries(headers);
+     try{
+       if (headersString.isEmpty) return {};
+       final headers = headersString.split('\n').map((item) => item.split(':')).map((pair) => MapEntry(pair[0], pair[1])).toList();
+       headerError.value=false;
+       return Map.fromEntries(headers);
+     }catch(e){
+       headerError.value=true;
+       AppUtils().snackBar(firstTitle: 'Headers Must key: value', secondTitle:  e.toString() ,maxWidth: Get.width/2 ,durationMilliseconds: 2000);
+       return {};
+     }
   }
 
 
@@ -122,6 +175,7 @@ class HomePageController extends GetxController {
     dynamic apiData=urls?[i];
   //  print("aptData: $apiData");
     switch(apiData["requestType"]){
+
       case "GET":
         try{
           apiDetails?.add(
@@ -140,9 +194,9 @@ class HomePageController extends GetxController {
           apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
            ApiRequest(url: apiData["url"],queryParams: apiData["queryParameter"],apiTimeOut: apiTimeOut.value,headers: apiData["headers"]).get(
             onSuccess: (res) {
-              String responseString = res.toString();
               apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
               totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+              String responseString = res.toString();
                apiDetails?[index]={
                  "urlNumber": (i + 1).toString(),
                  "apiIndex": (j + 1).toString(),
@@ -158,10 +212,13 @@ class HomePageController extends GetxController {
               print('api Success');
             },
             onError: (err,val) {
+              apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+              totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
               String responseString = val.toString();
               apiDetails?[index]={
                 "urlNumber": (i + 1).toString(),
                 "url": apiData['url'],
+                "apiIndex": (j + 1).toString(),
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
                 "endTime": apiEndTime.value,
@@ -184,6 +241,7 @@ class HomePageController extends GetxController {
               {
                 "urlNumber": (i + 1).toString(),
                 "url": apiData['url'],
+                "apiIndex": (j + 1).toString(),
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
                 "endTime": apiEndTime.value,
@@ -192,15 +250,21 @@ class HomePageController extends GetxController {
                 "statusCode": "Loader"
               }
           );
+          dynamic finalData= apiData['extractData']=='cURL'? apiData["data"] :  apiData['bodyType']=='JSON'? apiData["data"]  : dio.FormData.fromMap(apiData["data"]);
+          finalData= apiData['extractData']=='cURL'? apiData['bodyType']=='JSON'? finalData : dio.FormData.fromMap(apiData["data"]) : finalData;
+          print("final--${finalData} ---");
+
+
           apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
-          await ApiRequest(url: apiData["url"],data: apiData["data"],apiTimeOut: apiTimeOut.value,headers: apiData["headers"]).post(
+           ApiRequest(url: apiData["url"],data: finalData,apiTimeOut: apiTimeOut.value,headers: apiData["headers"]).post(
             onSuccess: (res) {
-            String responseString = res.toString();
             apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
             totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+            String responseString = res.toString();
             apiDetails?[index]={
               "urlNumber": (i + 1).toString(),
               "url": apiData['url'],
+              "apiIndex": (j + 1).toString(),
               "requestType":apiData['requestType'],
               "startTime": apiStartTime.value,
               "endTime": apiEndTime.value,
@@ -212,11 +276,14 @@ class HomePageController extends GetxController {
             print('api Success');
           },
             onError: (err,val) {
+              apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+              totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
               String responseString = val.toString();
               //print("=99${val.statusCode}");
               apiDetails?[index]={
                 "urlNumber": (i + 1).toString(),
                 "url": apiData['url'],
+                "apiIndex": (j + 1).toString(),
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
                 "endTime": apiEndTime.value,
@@ -225,7 +292,7 @@ class HomePageController extends GetxController {
                 "statusCode": err=="Response error" ? val.statusCode.toString() : err.toString(),
               };
               failedRequest.value+=1;
-              print("-----$err");
+              print("------$err");
             },
           );
         }catch (e) {
@@ -238,6 +305,7 @@ class HomePageController extends GetxController {
             {
               "urlNumber": (i + 1).toString(),
               "url": apiData['url'],
+              "apiIndex": (j + 1).toString(),
               "requestType":apiData['requestType'],
               "startTime": apiStartTime.value,
               "endTime": apiEndTime.value,
@@ -246,15 +314,27 @@ class HomePageController extends GetxController {
               "statusCode": "Loader"
             }
         );
+
+        dynamic finalData ;
+        if( apiData['data'] == null ){
+           print("----data is null--");
+        }else{
+          finalData= apiData['extractData']=='cURL'? apiData["data"] :  apiData['bodyType']=='JSON'? apiData["data"]  : dio.FormData.fromMap(apiData["data"]);
+          finalData= apiData['extractData']=='cURL'? apiData['bodyType']=='JSON'? finalData : dio.FormData.fromMap(apiData["data"]) : finalData;
+          print("final--${finalData} ---");
+        }
+
+
         apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
         await ApiRequest(url: apiData["url"],queryParams: apiData["queryParameter"],data: apiData["data"],apiTimeOut: apiTimeOut.value,headers: apiData["headers"]).put(
           onSuccess: (res) {
-            String responseString = res.toString();
             apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
             totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+            String responseString = res.toString();
             apiDetails?[index]={
               "urlNumber": (i + 1).toString(),
               "url": apiData['url'],
+              "apiIndex": (j + 1).toString(),
               "requestType":apiData['requestType'],
               "startTime": apiStartTime.value,
               "endTime": apiEndTime.value,
@@ -266,11 +346,14 @@ class HomePageController extends GetxController {
             print('api Success');
           },
           onError: (err,val) {
+            apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+            totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
             String responseString = val.toString();
           //  print("=99${val.statusCode}");
             apiDetails?[index]={
               "urlNumber": (i + 1).toString(),
               "url": apiData['url'],
+              "apiIndex": (j + 1).toString(),
               "requestType":apiData['requestType'],
               "startTime": apiStartTime.value,
               "endTime": apiEndTime.value,
@@ -292,6 +375,7 @@ class HomePageController extends GetxController {
                {
                  "urlNumber": (i + 1).toString(),
                  "url": apiData['url'],
+                 "apiIndex": (j + 1).toString(),
                  "requestType":apiData['requestType'],
                  "startTime": apiStartTime.value,
                  "endTime": apiEndTime.value,
@@ -303,12 +387,13 @@ class HomePageController extends GetxController {
            apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
            await ApiRequest(url: apiData["url"],queryParams: apiData["queryParameter"],apiTimeOut: apiTimeOut.value, headers: apiData["headers"]).delete(
              onSuccess: (res) {
-               String responseString = res.toString();
                apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
                totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+               String responseString = res.toString();
                apiDetails?[index]={
                  "urlNumber": (i + 1).toString(),
                  "url": apiData['url'],
+                 "apiIndex": (j + 1).toString(),
                  "requestType":apiData['requestType'],
                  "startTime": apiStartTime.value,
                  "endTime": apiEndTime.value,
@@ -320,11 +405,13 @@ class HomePageController extends GetxController {
                print('api Success');
              },
              onError: (err,val) {
+               apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+               totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
                String responseString = val.toString();
-              // print("=99${val.statusCode}");
                apiDetails?[index]={
                  "urlNumber": (i + 1).toString(),
                  "url": apiData['url'],
+                 "apiIndex": (j + 1).toString(),
                  "requestType":apiData['requestType'],
                  "startTime": apiStartTime.value,
                  "endTime": apiEndTime.value,
@@ -412,24 +499,50 @@ class HomePageController extends GetxController {
         }
       }
 
+
+      RegExp dataRegex = RegExp(r"""(--form|-F)\s+(['"])([\s\S]*?)\2""");
+      Iterable<RegExpMatch> matchesf = dataRegex.allMatches(curlCommand);
+
+      Map<String, dynamic> dataMap = {};
+     // dynamic formData;
+      for (var match in matchesf) {
+
+        String? data = match.group(3);
+        if (data != null) {
+          if (match.group(1) == '--form' || match.group(1) == '-F') {
+            var keyValue = data.split('=');
+            if (keyValue.length == 2) {
+              String key = keyValue[0];
+              String value = keyValue[1];
+              dataMap[key] = value.replaceAll('"', '').replaceAll(
+                  "'", ''); // Remove enclosing quotes
+            }
+          }
+        }
+        }
+
+
       // Extracting data (-d or --data)
       String? data;
       dynamic jsonData;
+      String? dataType;
       try{
         RegExp dataRegex = RegExp(r"""--data\s+(["\'][\s\S]+[^"\']*[\s\S]+["\'])|-d\s+(["\'][\s\S]+[^"\']*[\s\S]+["\'])""");
         data = dataRegex.allMatches(curlCommand).first.group(1) ?? dataRegex.allMatches(curlCommand).first.group(2);
+
       }
       catch(e) {
         print(e);
       }
 
-      if(requestType!.isEmpty && data.runtimeType==Null){
+      if(requestType!.isEmpty && data.runtimeType==Null && dataMap.isEmpty){
         requestType='GET';
       }
 
       if(data.runtimeType!=Null && requestType.isEmpty ){
         requestType='POST';
       }
+
 
       if(data.runtimeType!=Null){
 
@@ -442,23 +555,36 @@ class HomePageController extends GetxController {
         }
 
         jsonData=jsonDecode(data);
+        dataType='JSON';
       }
 
 
 
+      if(dataMap.isNotEmpty && requestType.isEmpty ){
+        requestType='POST';
+      }
 
-      urls?.add({'url':baseUrl,'queryParameter':queryParams,'data':jsonData,'requestType':requestType, 'headers':headers});
+      if(dataMap.isNotEmpty){
+        jsonData=dataMap;
+        dataType='Form-Data';
+      }
+
+
+     // print("type- jsonData ${jsonData.runtimeType}");
+
+
+
+
+      urls?.add({'url':baseUrl,'queryParameter':queryParams,'data':jsonData,"bodyType":dataType ,'requestType':requestType, 'headers':headers,"extractData":extractData.value});
+      cURLController.clear();
+      Get.back();
       print(urls);
 
-    }catch(e){
+    }catch(e) {
       //print(e);
-      Get.snackbar(e.toString(), '',
-        maxWidth:Get.width/4,
-          backgroundColor: Colors.black26,
-          colorText: Colors.white,
-          snackPosition:SnackPosition.BOTTOM,
+      AppUtils().snackBar(firstTitle: 'Please give valid Curl ', secondTitle: curlCommand,maxWidth: Get.width/2  ,durationMilliseconds: 1000);
 
-      );
+
     }
 
 
@@ -489,9 +615,9 @@ class HomePageController extends GetxController {
           apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
           ApiRequestHttp(url: apiData["url"],queryParams: apiData["queryParameter"],apiTimeOut: apiTimeOut.value,headers: apiData["headers"]).get(
             onSuccess: (res) {
-              String responseString = res.body.toString();
               apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
               totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+              String responseString = res.body.toString();
               apiDetails?[index]={
                 "urlNumber": (i + 1).toString(),
                 "apiIndex": (j + 1).toString(),
@@ -507,16 +633,19 @@ class HomePageController extends GetxController {
               print('api Success');
             },
             onError: (err,val) {
-              String responseString = val.toString();
+              apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+              totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+              String responseString = err.toString();
               apiDetails?[index]={
                 "urlNumber": (i + 1).toString(),
                 "url": apiData['url'],
+                "apiIndex": (j + 1).toString(),
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
                 "endTime": apiEndTime.value,
                 "duration": totalDuration.value,
                 "resBody": responseString,
-                "statusCode":  err.toString(),
+                "statusCode":  val is int ? val.toString() : err.toString(),
               };
               failedRequest.value+=1;
               print("-----$err ,$val");
@@ -533,6 +662,7 @@ class HomePageController extends GetxController {
               {
                 "urlNumber": (i + 1).toString(),
                 "url": apiData['url'],
+                "apiIndex": (j + 1).toString(),
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
                 "endTime": apiEndTime.value,
@@ -541,15 +671,29 @@ class HomePageController extends GetxController {
                 "statusCode": "Loader"
               }
           );
+          dynamic finalData= apiData['extractData']=='cURL'? apiData['bodyType']=='JSON'? apiData["data"]  :  dio.FormData.fromMap(apiData["data"]) :  apiData['bodyType']=='JSON'? apiData["data"]  :  dio.FormData.fromMap(apiData["data"]);
+          print('final1:--$finalData  ---${json.runtimeType}  ');
+
+          finalData = finalData.runtimeType==dio.FormData  ? Map.fromEntries(finalData.fields) : jsonEncode(finalData);
+
+          print('final2:--$finalData');
+          if(finalData.runtimeType==String){
+            finalData= jsonDecode(finalData);
+            finalData=finalData.map((key,value)=>MapEntry(key, value.toString()));
+            finalData =jsonEncode(finalData);
+          }
+          print(finalData);
+
           apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
-           ApiRequest(url: apiData["url"],data: apiData["data"],apiTimeOut:apiTimeOut.value,headers: apiData["headers"]).post(
+           ApiRequestHttp(url: apiData["url"],data:finalData ,apiTimeOut:apiTimeOut.value,headers: apiData["headers"]).post(
             onSuccess: (res) {
-              String responseString = res.toString();
               apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
               totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+              String responseString = res.body.toString();
               apiDetails?[index]={
                 "urlNumber": (i + 1).toString(),
                 "url": apiData['url'],
+                "apiIndex": (j + 1).toString(),
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
                 "endTime": apiEndTime.value,
@@ -561,17 +705,20 @@ class HomePageController extends GetxController {
               print('api Success');
             },
             onError: (err,val) {
-              String responseString = val.toString();
+              apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+              totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+              String responseString = err.toString();
               //print("=99${val.statusCode}");
               apiDetails?[index]={
                 "urlNumber": (i + 1).toString(),
                 "url": apiData['url'],
+                "apiIndex": (j + 1).toString(),
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
                 "endTime": apiEndTime.value,
                 "duration": totalDuration.value,
                 "resBody": responseString,
-                "statusCode": err=="Response error" ? val.statusCode.toString() : err.toString(),
+                "statusCode": val is int ? val.toString() : err.toString(),
               };
               failedRequest.value+=1;
               print("-----$err");
@@ -587,6 +734,7 @@ class HomePageController extends GetxController {
               {
                 "urlNumber": (i + 1).toString(),
                 "url": apiData['url'],
+                "apiIndex": (j + 1).toString(),
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
                 "endTime": apiEndTime.value,
@@ -595,15 +743,32 @@ class HomePageController extends GetxController {
                 "statusCode": "Loader"
               }
           );
+          if(apiData['data'] == null){
+            print('---data is null');
+          }else{
+            dynamic finalData= apiData['extractData']=='cURL'? apiData['bodyType']=='JSON'? apiData["data"]  :  dio.FormData.fromMap(apiData["data"]) :  apiData['bodyType']=='JSON'? apiData["data"]  :  dio.FormData.fromMap(apiData["data"]);
+            print('final1:--$finalData  ---${json.runtimeType}  ');
+
+            finalData = finalData.runtimeType==dio.FormData  ? Map.fromEntries(finalData.fields) : jsonEncode(finalData);
+
+            print('final2:--$finalData');
+            if(finalData.runtimeType==String){
+              finalData= jsonDecode(finalData);
+              finalData=finalData.map((key,value)=>MapEntry(key, value.toString()));
+              finalData =jsonEncode(finalData);
+            }
+            print(finalData);
+          }
           apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
-           ApiRequest(url: apiData["url"],queryParams: apiData["queryParameter"],data: apiData["data"],apiTimeOut: apiTimeOut.value,headers: apiData["headers"]).put(
+           ApiRequestHttp(url: apiData["url"],queryParams: apiData["queryParameter"],data: apiData["data"],apiTimeOut: apiTimeOut.value,headers: apiData["headers"]).put(
             onSuccess: (res) {
-              String responseString = res.toString();
               apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
               totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+              String responseString = res.body.toString();
               apiDetails?[index]={
                 "urlNumber": (i + 1).toString(),
                 "url": apiData['url'],
+                "apiIndex": (j + 1).toString(),
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
                 "endTime": apiEndTime.value,
@@ -615,17 +780,19 @@ class HomePageController extends GetxController {
               print('api Success');
             },
             onError: (err,val) {
-              String responseString = val.toString();
-              //  print("=99${val.statusCode}");
+              apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+              totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+              String responseString = err.toString();
               apiDetails?[index]={
                 "urlNumber": (i + 1).toString(),
                 "url": apiData['url'],
+                "apiIndex": (j + 1).toString(),
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
                 "endTime": apiEndTime.value,
                 "duration": totalDuration.value,
                 "resBody": responseString,
-                "statusCode": err=="Response error" ? val.statusCode.toString() : err.toString(),
+                "statusCode": val is int ? val.toString() : err.toString(),
               };
               failedRequest.value+=1;
               print("-----$err");
@@ -641,6 +808,7 @@ class HomePageController extends GetxController {
               {
                 "urlNumber": (i + 1).toString(),
                 "url": apiData['url'],
+                "apiIndex": (j + 1).toString(),
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
                 "endTime": apiEndTime.value,
@@ -650,14 +818,15 @@ class HomePageController extends GetxController {
               }
           );
           apiStartTime.value = DateTime.now().millisecondsSinceEpoch.toString();
-           ApiRequest(url: apiData["url"],queryParams: apiData["queryParameter"],apiTimeOut: apiTimeOut.value, headers: apiData["headers"]).delete(
+           ApiRequestHttp(url: apiData["url"],queryParams: apiData["queryParameter"],apiTimeOut: apiTimeOut.value, headers: apiData["headers"]).delete(
             onSuccess: (res) {
-              String responseString = res.toString();
               apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
               totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+              String responseString = res.body.toString();
               apiDetails?[index]={
                 "urlNumber": (i + 1).toString(),
                 "url": apiData['url'],
+                "apiIndex": (j + 1).toString(),
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
                 "endTime": apiEndTime.value,
@@ -669,17 +838,19 @@ class HomePageController extends GetxController {
               print('api Success');
             },
             onError: (err,val) {
-              String responseString = val.toString();
-              // print("=99${val.statusCode}");
+              apiEndTime.value = DateTime.now().millisecondsSinceEpoch.toString();
+              totalDuration.value = int.parse(apiEndTime.value) - int.parse(apiStartTime.value);
+              String responseString = err.toString();
               apiDetails?[index]={
                 "urlNumber": (i + 1).toString(),
                 "url": apiData['url'],
+                "apiIndex": (j + 1).toString(),
                 "requestType":apiData['requestType'],
                 "startTime": apiStartTime.value,
                 "endTime": apiEndTime.value,
                 "duration": totalDuration.value,
                 "resBody": responseString,
-                "statusCode": err=="Response error" ? val.statusCode.toString() : err.toString(),
+                "statusCode": val is int ? val.toString() : err.toString(),
               };
               failedRequest.value+=1;
               print("-----$err");

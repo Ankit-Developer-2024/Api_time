@@ -21,13 +21,13 @@ class ApiRequestHttp {
     Function(dynamic error,dynamic val)? onError,
   }) async {
     try {
-      // print("url:----${url} ---- ${this.queryParams as Map<String, dynamic>}----${this.headers}");
 
-      final finalUrl= Uri.parse(this.url!).replace(queryParameters: queryParams );
+      // print("url:----${url} ---- ${this.queryParams as Map<String, dynamic>}----${this.headers}");
+      final finalUrl= queryParams!.isEmpty ? Uri.parse(this.url!)   : Uri.parse(this.url!).replace(queryParameters: queryParams );
       dynamic response = await http.get(finalUrl,headers: headers as Map<String,String>).timeout(Duration(milliseconds: apiTimeOut));
 
       if (response.statusCode==200) {
-        print("res==${response}");
+        // print("res==${response}");
         onSuccess?.call(response);
       } else {
         switch (response.statusCode) {
@@ -84,7 +84,6 @@ class ApiRequestHttp {
   }) async {
     try {
       // print("api call triggered --->" + this.url!);
-
       final finalUrl= Uri.parse(this.url!);
       dynamic response = await http.post(finalUrl,body: data,headers: headers as Map<String,String>).timeout(Duration(milliseconds: apiTimeOut));
 
@@ -144,7 +143,7 @@ class ApiRequestHttp {
   }) async {
     try {
 
-      final finalUrl= Uri.parse(this.url!).replace(queryParameters: queryParams);
+      final finalUrl= queryParams!.isEmpty ? Uri.parse(url!)   : Uri.parse(url!).replace(queryParameters: queryParams );
       dynamic response = await http.delete(finalUrl,headers: headers as Map<String,String>).timeout(Duration(milliseconds: apiTimeOut));
 
       if (response.statusCode==200) {
@@ -204,7 +203,7 @@ class ApiRequestHttp {
     try {
       print("PUT:$data");
 
-      final finalUrl= Uri.parse(this.url!).replace(queryParameters: queryParams);
+      final finalUrl= queryParams!.isEmpty ? Uri.parse(url!)   : Uri.parse(url!).replace(queryParameters: queryParams );
       dynamic response = await http.put(finalUrl,body: data ,headers: headers as Map<String,String>).timeout(Duration(milliseconds: apiTimeOut));
 
       if (response.statusCode==200 || response.statusCode==201) {
@@ -249,7 +248,7 @@ class ApiRequestHttp {
       onError?.call("Invalid format",e.message);
       return null;
     } catch (e) {
-      print('Uncaught exception: ${e.toString()}');
+      print('Uncaught  exception: ${e.toString()}');
       onError?.call(e,"");
       return null;
     }
