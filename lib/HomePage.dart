@@ -4,6 +4,7 @@ import 'package:api_time/HomePageController.dart';
 import 'package:api_time/ResponsePage.dart';
 import 'package:api_time/CommonUIComponent.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import 'AppColors.dart';
@@ -22,8 +23,7 @@ class HomePage extends StatelessWidget {
          child: Row(
            children: [
              //Left side api
-             leftSideApi(controller,context),
-
+             leftSideCurlUrl(controller,context),
              const SizedBox(width: 5,),
              //Right side  details
              rightSideApiDetails(controller,context),
@@ -36,16 +36,17 @@ class HomePage extends StatelessWidget {
 }
 
 
- Widget leftSideApi(HomePageController controller,BuildContext context){
+ Widget leftSideCurlUrl(HomePageController controller,BuildContext context){
 
   return Expanded(
        flex: 2,
        child: Obx(() {
          return Container(
            color: Colors.white,
-           padding: const EdgeInsets.symmetric(horizontal: px_5),
+           padding: const EdgeInsets.only(right: px_5),
            child: Container(
              color: const Color.fromRGBO(211, 211, 211, 1),
+             padding: const EdgeInsets.only(left: 3),
              child: Column(
                children: [
                  Row(
@@ -161,6 +162,8 @@ class HomePage extends StatelessWidget {
                        child:CommonUiComponent().button(btnName: 'Clear', onTap: (){
                          controller.urls?.clear();
                          controller.apiDetails?.clear();
+                         controller.successRequest.value=0;
+                         controller.failedRequest.value=0;
                        })
 
                      ),
@@ -204,6 +207,9 @@ class HomePage extends StatelessWidget {
                            controller: controller.apiCallCountController,
                            style: const TextStyle(color: AppColors.textFieldTextColor,fontSize: textFieldTextSize),
                            keyboardType: TextInputType.number,
+                           inputFormatters:<TextInputFormatter> [
+                             FilteringTextInputFormatter.digitsOnly
+                           ],
                            decoration: const InputDecoration(
                              labelText: "Api count ",
                              labelStyle: TextStyle(color: AppColors.textFieldLabel,fontSize: textFieldLabelSize),
@@ -231,6 +237,9 @@ class HomePage extends StatelessWidget {
                        controller: controller.timeOutController,
                        style: const TextStyle(color:AppColors.textFieldTextColor,fontSize: textFieldTextSize),
                        keyboardType: TextInputType.number,
+                       inputFormatters:<TextInputFormatter> [
+                           FilteringTextInputFormatter.digitsOnly
+                         ],
                        decoration: const InputDecoration(
                          labelText: "Api timeout(millisec)",
                          labelStyle: TextStyle(color: AppColors.textFieldLabel,fontSize: textFieldLabelSize),
@@ -253,6 +262,9 @@ class HomePage extends StatelessWidget {
                        controller: controller.apiIntervalController,
                        style: const TextStyle(color: AppColors.textFieldTextColor,fontSize: textFieldTextSize),
                        keyboardType: TextInputType.number,
+                       inputFormatters:<TextInputFormatter> [
+                           FilteringTextInputFormatter.digitsOnly
+                         ],
                        decoration: const InputDecoration(
                          labelText: "Interval (millisec)",
                          labelStyle: TextStyle(color: AppColors.textFieldLabel,fontSize: textFieldLabelSize),
@@ -273,7 +285,7 @@ class HomePage extends StatelessWidget {
                        },
 
                      ),),
-                     const SizedBox(width: px_3,),
+                     const SizedBox(width: 3,),
                      Expanded(
                          flex: 1,
                          child: ConstrainedBox(
@@ -284,7 +296,7 @@ class HomePage extends StatelessWidget {
                                  controller.successRequest.value=0;
                                  controller.failedRequest.value=0;
                                  if(controller.urls!= null && controller.urls!.isNotEmpty){
-                                   controller.api();
+                                   controller.startCallingApi();
                                  }
                                  else{
 
@@ -482,7 +494,7 @@ Widget addCurl(HomePageController controller,BuildContext context){
     return Column(
       children: [
         SizedBox(
-          width: Get.width/3,
+          width: Get.width/3+30,
           child: TextField(
             controller: controller.cURLController,
             minLines: 10,
@@ -519,7 +531,7 @@ Widget addCurl(HomePageController controller,BuildContext context){
             CommonUiComponent().button(btnName: 'Add' ,bgColor:   controller.cURLError.value ? AppColors.grey : AppColors.blue ,  onTap: (){
 
               if(controller.cURLController.text.isNotEmpty ){
-                controller.setData();
+                controller.setDataByCurl();
               }else{
                 controller.cURLError.value=true;
               }
@@ -780,7 +792,7 @@ Widget addUrl(HomePageController controller,BuildContext context){
               }
               else{
                 if(controller.urlController.text.isNotEmpty && controller.urlController.text.startsWith('http') ){
-                  controller.setData2();
+                  controller.setDataByUrl();
                 }
               }
             }),
