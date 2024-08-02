@@ -80,9 +80,6 @@ class HomePageController extends GetxController {
            print('in setData  as list:  $cURL');
     }
 
-    if (timeOutController.text.isNotEmpty) {
-      apiTimeOut.value = int.parse(timeOutController.text);
-    }
 
     for (int i = 0; i <cURL.length;i++){
         callApiFromCurl(cURL[i]);

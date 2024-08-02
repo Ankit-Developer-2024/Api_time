@@ -61,8 +61,8 @@ class HomePage extends StatelessWidget {
                        child: DropdownButtonHideUnderline(
                          child: DropdownButton(
                            value:controller.apiMethod.value,
-                           dropdownColor: Colors.grey,
-                           iconEnabledColor: Colors.white,
+                           dropdownColor: const Color.fromRGBO(211, 211, 211, 1),
+                           iconEnabledColor: AppColors.white,
                            items:controller.requestMethod.map((String val) {
                              return DropdownMenuItem<String>(
                                value: val,
@@ -254,6 +254,11 @@ class HomePage extends StatelessWidget {
                          ),
                          isDense: true,
                        ),
+                       onChanged: (value){
+                           if(value.isNotEmpty){
+                             controller.apiTimeOut.value = int.parse(value);
+                           }
+                         },
                      ),),
                      const SizedBox(width: 3,),
                      Expanded(
@@ -573,28 +578,35 @@ Widget addUrl(HomePageController controller,BuildContext context){
                       const Text('Request Type:',style: TextStyle(fontSize: textSize_13,color: AppColors.black),),
                       const SizedBox(width: 5,),
                       Container(
-                        color: Colors.grey,
-                        child: DropdownButton(
-                          value:controller.apiRequestType.value,
-                          items:controller.requestType.map((String val) {
-                            return DropdownMenuItem<String>(
-                              value: val,
-                              child: Text(val,style: const TextStyle(color: AppColors.black,fontSize: textSize_13)),
-                            );
-                          }).toList(),
-                          isDense: true,
-                          padding: const EdgeInsets.only(left: 5),
-                          onChanged: (val){
-                            controller.apiRequestType.value=val!;
-                            controller.apiBodyType.value='';
-                            controller.urlController.clear();
-                            controller.headersController.clear();
-                            controller.queryParamsController.clear();
-                            controller.bodyController.clear();
-                            controller.postRequestError.value=false;
-                            controller.putRequestError.value=false;
-                            controller.putPostHeaderError.value=false;
-                          },),
+
+                        decoration: BoxDecoration(
+                            color: AppColors.lightGrey,
+                          border: Border.all(color: AppColors.white,width: 0.5)
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton(
+                            value:controller.apiRequestType.value,
+                            items:controller.requestType.map((String val) {
+                              return DropdownMenuItem<String>(
+                                value: val,
+                                child: Text(val,style: const TextStyle(color: AppColors.black,fontSize: textSize_13)),
+                              );
+                            }).toList(),
+                            isDense: true,
+                            padding: const EdgeInsets.only(left: 5),
+                            iconEnabledColor: AppColors.black,
+                            onChanged: (val){
+                              controller.apiRequestType.value=val!;
+                              controller.apiBodyType.value='';
+                              controller.urlController.clear();
+                              controller.headersController.clear();
+                              controller.queryParamsController.clear();
+                              controller.bodyController.clear();
+                              controller.postRequestError.value=false;
+                              controller.putRequestError.value=false;
+                              controller.putPostHeaderError.value=false;
+                            },),
+                        ),
                       ),
                     ],
                   ),
