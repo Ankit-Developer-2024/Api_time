@@ -47,7 +47,7 @@ class CommonUiComponent{
     Color textColor=Colors.white,
     Color bgColor=Colors.blue,
     Color borderColor=Colors.white,
-    double borderWidth=0.5,
+    double borderWidth=0.1,
     double horizontalPadding=0,
     double verticalPadding=0,
     double borderRadius=3,
