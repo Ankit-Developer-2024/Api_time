@@ -1,10 +1,10 @@
-import 'package:api_time/CommonUIComponent.dart';
+import 'package:api_time/constant/widgets/CommonUIComponent.dart';
 import 'package:dio/dio.dart' as dio;
 
 import 'dart:convert';
 
-import 'package:api_time/ApiRequestDio.dart';
-import 'package:api_time/ApiRequestHttp.dart';
+import 'package:api_time/dio_&_http_request/ApiRequestDio.dart';
+import 'package:api_time/dio_&_http_request/ApiRequestHttp.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
