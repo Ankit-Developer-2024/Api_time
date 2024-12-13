@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 
 class ApiRequestDio {
@@ -45,37 +46,41 @@ class ApiRequestDio {
     } on DioException catch (e) {
         apiEndTime =DateTime.now().millisecondsSinceEpoch.toString();
         if (e.type == DioExceptionType.connectionTimeout) {
-          print('Connection timeout');
+          if (kDebugMode) {
+            print('Connection timeout');
+          }
           onError?.call("Connection timeout",e.message,apiStartTime,apiEndTime);
 
           return null;
         } else if (e.type == DioExceptionType.sendTimeout) {
-          print('Send timeout');
+          //print('Send timeout');
           onError?.call("Send timeout",e.message,apiStartTime,apiEndTime);
           return null;
         } else if (e.type == DioExceptionType.receiveTimeout) {
-          print('Receive timeout');
+          //print('Receive timeout');
           onError?.call("Receive timeout",e.message,apiStartTime,apiEndTime);
           return null;
         } else if (e.type == DioExceptionType.badResponse) {
           // The server responded with a non-2xx status code
-          print('Response error: ${e.response?.statusCode}');
+         // print('Response error: ${e.response?.statusCode}');
           onError?.call("Response error",e.response,apiStartTime,apiEndTime);
           return null;
         } else if (e.type == DioExceptionType.cancel) {
-          print('Request cancelled');
+          //print('Request cancelled');
           onError?.call("Request cancelled",e.message,apiStartTime,apiEndTime);
           return null;
         } else if (e.type == DioExceptionType.unknown) {
           // Other errors, such as network issues or DNS lookup failures
-          print('Other error: ${e.message}');
+          if (kDebugMode) {
+            print('Other error: ${e.message}');
+          }
           onError?.call("Other error",e.message,apiStartTime,apiEndTime);
           return null;
 
         }
       } catch (e) {
       apiEndTime =DateTime.now().millisecondsSinceEpoch.toString();
-      print('Uncaught exception: ${e.toString()}');
+      //print('Uncaught exception: ${e.toString()}');
       onError?.call(e,"",apiStartTime,apiEndTime);
       return null;
     }
@@ -105,29 +110,41 @@ class ApiRequestDio {
     } on DioException catch (e) {
       apiEndTime =DateTime.now().millisecondsSinceEpoch.toString();
       if (e.type == DioExceptionType.connectionTimeout) {
-        print('Connection timeout');
+        if (kDebugMode) {
+          print('Connection timeout');
+        }
         onError?.call("Connection timeout",e.message,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.sendTimeout) {
-        print('Send timeout');
+        if (kDebugMode) {
+          print('Send timeout');
+        }
         onError?.call("Send timeout",e.message,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.receiveTimeout) {
-        print('Receive timeout');
+        if (kDebugMode) {
+          print('Receive timeout');
+        }
         onError?.call("Receive timeout",e.message,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.badResponse) {
         // The server responded with a non-2xx status code
-        print('Response error: ${e.response?.statusCode}');
+        if (kDebugMode) {
+          print('Response error: ${e.response?.statusCode}');
+        }
         onError?.call("Response error",e.response,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.cancel) {
-        print('Request cancelled');
+        if (kDebugMode) {
+          print('Request cancelled');
+        }
         onError?.call("Request cancelled",e.message,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.unknown) {
         // Other errors, such as network issues or DNS lookup failures
-        print('Other error: ${e.message}');
+        if (kDebugMode) {
+          print('Other error: ${e.message}');
+        }
         onError?.call("Other error",e.message,apiStartTime,apiEndTime);
         return null;
       }
@@ -157,29 +174,41 @@ class ApiRequestDio {
     } on DioException catch (e) {
       apiEndTime =DateTime.now().millisecondsSinceEpoch.toString();
       if (e.type == DioExceptionType.connectionTimeout) {
-        print('Connection timeout');
+        if (kDebugMode) {
+          print('Connection timeout');
+        }
         onError?.call("Connection timeout",e.message,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.sendTimeout) {
-        print('Send timeout');
+        if (kDebugMode) {
+          print('Send timeout');
+        }
         onError?.call("Send timeout",e.message,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.receiveTimeout) {
-        print('Receive timeout');
+        if (kDebugMode) {
+          print('Receive timeout');
+        }
         onError?.call("Receive timeout",e.message,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.badResponse) {
         // The server responded with a non-2xx status code
-        print('Response error: ${e.response?.statusCode}');
+        if (kDebugMode) {
+          print('Response error: ${e.response?.statusCode}');
+        }
         onError?.call("Response error",e.response,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.cancel) {
-        print('Request cancelled');
+        if (kDebugMode) {
+          print('Request cancelled');
+        }
         onError?.call("Request cancelled",e.message,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.unknown) {
         // Other errors, such as network issues or DNS lookup failures
-        print('Other error: ${e.message}');
+        if (kDebugMode) {
+          print('Other error: ${e.message}');
+        }
         onError?.call("Other error",e.message,apiStartTime,apiEndTime);
         return null;
       }
@@ -210,29 +239,41 @@ class ApiRequestDio {
     } on DioException catch (e) {
       apiEndTime =DateTime.now().millisecondsSinceEpoch.toString();
       if (e.type == DioExceptionType.connectionTimeout) {
-        print('Connection timeout');
+        if (kDebugMode) {
+          print('Connection timeout');
+        }
         onError?.call("Connection timeout",e.message,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.sendTimeout) {
-        print('Send timeout');
+        if (kDebugMode) {
+          print('Send timeout');
+        }
         onError?.call("Send timeout",e.message,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.receiveTimeout) {
-        print('Receive timeout');
+        if (kDebugMode) {
+          print('Receive timeout');
+        }
         onError?.call("Receive timeout",e.message,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.badResponse) {
         // The server responded with a non-2xx status code
-        print('Response error: ${e.response?.statusCode}');
+        if (kDebugMode) {
+          print('Response error: ${e.response?.statusCode}');
+        }
         onError?.call("Response error",e.response,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.cancel) {
-        print('Request cancelled');
+        if (kDebugMode) {
+          print('Request cancelled');
+        }
         onError?.call("Request cancelled",e.message,apiStartTime,apiEndTime);
         return null;
       } else if (e.type == DioExceptionType.unknown) {
         // Other errors, such as network issues or DNS lookup failures
-        print('Other error: ${e.message}');
+        if (kDebugMode) {
+          print('Other error: ${e.message}');
+        }
         onError?.call("Other  error",e.message,apiStartTime,apiEndTime);
         return null;
       }
