@@ -4,8 +4,6 @@ A new Flutter project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
 • Here, you can test the total time taken by the API to get a response from the server.
 
 • Please use only those APIs whose responses are in JSON format.
